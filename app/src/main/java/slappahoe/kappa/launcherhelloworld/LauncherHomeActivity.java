@@ -29,15 +29,14 @@ public class LauncherHomeActivity extends Activity {
 
     }
 
-    public void showApps(View view)
-    {
+    public void showApps(View view) {
         Intent i = new Intent(this, AppsListActivity.class);
         startActivity(i);
     }
 
-    public View.OnClickListener showAppsListener = new View.OnClickListener(){
+    public View.OnClickListener showAppsListener = new View.OnClickListener() {
         @Override
-        public void onClick(View view){
+        public void onClick(View view) {
             showApps(view);
         }
     };

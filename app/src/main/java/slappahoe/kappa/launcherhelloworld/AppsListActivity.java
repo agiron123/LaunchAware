@@ -29,17 +29,18 @@ public class AppsListActivity extends Activity {
         setContentView(R.layout.activity_apps_list);
 
         final String TAG = "AppsListActivity";
-        final PackageManager pm = getPackageManager();
+        final PackageManager packageManager = getPackageManager();
+
         //get a list of installed apps.
-        final List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+        final List<ApplicationInfo> packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
 
         /*
         try {
-            imageView.setImageDrawable(pm.getApplicationIcon(packages.get(133).packageName));
+            imageView.setImageDrawable(packageManager.getApplicationIcon(packages.get(133).packageName));
             int index = 0;
             for (ApplicationInfo packageInfo : packages) {
 
-//                if(pm.getLaunchIntentForPackage(packageInfo.packageName) == null)
+//                if(packageManager.getLaunchIntentForPackage(packageInfo.packageName) == null)
 //                {
 //                    packages.remove(index);
 //                }
@@ -49,8 +50,8 @@ public class AppsListActivity extends Activity {
                 index++;
                 Log.d(TAG, "Installed package :" + packageInfo.packageName);
                 Log.d(TAG, "Source dir : " + packageInfo.sourceDir);
-                Log.d(TAG, "Launch Activity :" + pm.getLaunchIntentForPackage(packageInfo.packageName));
-                Log.d(TAG, "Launch Icon : " + pm.getApplicationIcon(packageInfo.packageName));
+                Log.d(TAG, "Launch Activity :" + packageManager.getLaunchIntentForPackage(packageInfo.packageName));
+                Log.d(TAG, "Launch Icon : " + packageManager.getApplicationIcon(packageInfo.packageName));
 
             }
         } catch (Exception e) {
@@ -64,7 +65,7 @@ public class AppsListActivity extends Activity {
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                startActivity(pm.getLaunchIntentForPackage(packages.get(position).packageName));
+                startActivity(packageManager.getLaunchIntentForPackage(packages.get(position).packageName));
             }
         });
     }

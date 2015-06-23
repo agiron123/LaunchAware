@@ -6,24 +6,21 @@ import java.util.ArrayList;
  * Created by andre on 6/21/15.
  */
 public class AppInfo {
+
     private String packageName;
     private String name;
 
     private int launches;
     private ArrayList<String> categories;
 
-    public AppInfo(String name, String packageName, int launches)
-    {
+    public AppInfo(String name, String packageName, int launches) {
         this.name = name;
         this.packageName = packageName;
         this.launches = launches;
     }
 
-    public AppInfo(String name)
-    {
-        this.name = name;
-        this.launches = 0;
-        this.packageName = "";
+    public AppInfo() {
+        this("", "", 0);
     }
 
     public ArrayList<String> getCategories() {
