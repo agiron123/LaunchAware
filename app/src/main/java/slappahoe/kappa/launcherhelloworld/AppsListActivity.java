@@ -5,15 +5,18 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.List;
@@ -22,6 +25,8 @@ import java.util.List;
 public class AppsListActivity extends Activity {
 
     private ImageView imageView;
+    private View homeView;
+    private String DEBUG_TAG = "AppsListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,30 +38,6 @@ public class AppsListActivity extends Activity {
 
         //get a list of installed apps.
         final List<ApplicationInfo> packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
-
-        /*
-        try {
-            imageView.setImageDrawable(packageManager.getApplicationIcon(packages.get(133).packageName));
-            int index = 0;
-            for (ApplicationInfo packageInfo : packages) {
-
-//                if(packageManager.getLaunchIntentForPackage(packageInfo.packageName) == null)
-//                {
-//                    packages.remove(index);
-//                }
-
-
-                Log.d(TAG, "index: " + index);
-                index++;
-                Log.d(TAG, "Installed package :" + packageInfo.packageName);
-                Log.d(TAG, "Source dir : " + packageInfo.sourceDir);
-                Log.d(TAG, "Launch Activity :" + packageManager.getLaunchIntentForPackage(packageInfo.packageName));
-                Log.d(TAG, "Launch Icon : " + packageManager.getApplicationIcon(packageInfo.packageName));
-
-            }
-        } catch (Exception e) {
-
-        } */
 
         GridView gridview = (GridView) findViewById(R.id.gridView);
         gridview.setVerticalScrollBarEnabled(false);
