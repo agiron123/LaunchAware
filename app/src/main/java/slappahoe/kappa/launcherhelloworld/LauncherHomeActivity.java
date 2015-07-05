@@ -2,22 +2,29 @@ package slappahoe.kappa.launcherhelloworld;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.view.MotionEventCompat;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
-
 public class LauncherHomeActivity extends Activity {
+
+    private final String DEBUG_TAG = "LauncherHomeActiviy";
+    private float xInitial = 0;
+    private float yInitial = 0;
+
+    //Y distance threshold for swipe down gesture to be recognized.
+    private final float swipeThreshold = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher_home);
-
 
         final Button appMenuButton = (Button) findViewById(R.id.appMenuButton);
         appMenuButton.setOnClickListener(new View.OnClickListener() {
@@ -32,6 +39,43 @@ public class LauncherHomeActivity extends Activity {
     public void showApps(View view) {
         Intent i = new Intent(this, AppsListActivity.class);
         startActivity(i);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+
+        int action = MotionEventCompat.getActionMasked(event);
+
+        switch(action) {
+            //User just tapped on the screen
+            case (MotionEvent.ACTION_DOWN) :{
+                xInitial = event.getX();
+                yInitial = event.getY();
+
+                Log.d(DEBUG_TAG, "Down, XInit: " + xInitial + " YInit: " + yInitial);
+                return true;
+            }
+
+            //User moved finger
+            case (MotionEvent.ACTION_MOVE) :{
+
+                return true;
+            }
+
+            //User just lifted finger off of screen
+            case (MotionEvent.ACTION_UP) :{
+                if(event.getY() - yInitial >= swipeThreshold)
+                {
+                    Log.d(DEBUG_TAG, "yDist: " + (event.getY() - yInitial));
+                    Intent i = new Intent(this, AppsListActivity.class);
+                    startActivity(i);
+                }
+                return true;
+            }
+
+            default :
+                return super.onTouchEvent(event);
+        }
     }
 
     public View.OnClickListener showAppsListener = new View.OnClickListener() {
