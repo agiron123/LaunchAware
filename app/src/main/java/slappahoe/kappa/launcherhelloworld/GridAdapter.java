@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
+
  * Created by andre on 6/21/15.
  */
 public class GridAdapter extends BaseAdapter {
@@ -43,20 +44,35 @@ public class GridAdapter extends BaseAdapter {
 
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
-
         //Inflate the layout
-        LinearLayout layout = new LinearLayout(context);
-        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        // Add The Text!!!
+        //LinearLayout layout = new LinearLayout(context);
 
+        if (convertView == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = layoutInflater.inflate(R.layout.grid_item, parent, false);
+        }
+
+        ImageView icon = (ImageView) convertView.findViewById(R.id.appIcon);
+        Drawable appIcon = packageManager.getApplicationIcon(packages.get(position));
+        icon.setImageDrawable(appIcon);
+
+        TextView appName = (TextView) convertView.findViewById(R.id.appName);
+        appName.setText(packageManager.getApplicationLabel(packages.get(position)));
+
+        return convertView;
+
+        /*
         ImageView iv = new ImageView(context);
         iv.setId(R.id.appIcon);
         Drawable appIcon = packageManager.getApplicationIcon(packages.get(position));
         iv.setImageDrawable(appIcon);
+        */
 
 //        TextView tv = (TextView) view.findViewById(R.id.appName);
 //        tv.setText(packages.get(position).name);
 
+
+        /*
         TextView text = new TextView(context);
         text.setId(R.id.appName);
         text.setText(packageManager.getApplicationLabel(packages.get(position)));
@@ -64,7 +80,9 @@ public class GridAdapter extends BaseAdapter {
         layout.addView(iv);
         layout.addView(text);
 
-//        View view = layoutInflater.inflate(R.layout.grid_item, layout, false);
+        View view = layoutInflater.inflate(R.layout.grid_item, layout, false);
+        layout.addView(view);
         return layout;
+        */
     }
 }

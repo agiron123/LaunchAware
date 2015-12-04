@@ -1,42 +1,44 @@
 package slappahoe.kappa.launcherhelloworld;
-
-import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by andre on 6/21/15.
  */
+
 public class AppInfo {
 
     private String packageName;
     private String name;
+    private String wifiSSId;
+    private String bluetoothNetwork;
 
-    private int launches;
-    private ArrayList<String> categories;
+    //Private class for serialization in Gson.
+    private LocationInfo locationInfo;
 
-    public AppInfo(String name, String packageName, int launches) {
-        this.name = name;
+    //Time that the application was launched.
+    private Date launchTime;
+
+    public AppInfo(String packageName) {
         this.packageName = packageName;
-        this.launches = launches;
+        this.launchTime = new Date();
     }
 
-    public AppInfo() {
-        this("", "", 0);
+    public AppInfo(String packageName, double latitude, double longitude, String wifiSSId){
+        this(packageName);
+        this.locationInfo = new LocationInfo(latitude, longitude);
+        this.wifiSSId = wifiSSId;
     }
 
-    public ArrayList<String> getCategories() {
-        return categories;
+    public void setBluetoothNetwork(String bluetoothNetwork) {
+        this.bluetoothNetwork = bluetoothNetwork;
     }
 
-    public void setCategories(ArrayList<String> categories) {
-        this.categories = categories;
+    public String getWifiSSId() {
+        return this.wifiSSId;
     }
 
-    public int getLaunches() {
-        return launches;
-    }
-
-    public void setLaunches(int launches) {
-        this.launches = launches;
+    public void setWifiSSId(String ssid) {
+        this.wifiSSId = ssid;
     }
 
     public String getName() {
@@ -53,6 +55,16 @@ public class AppInfo {
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
+    }
+
+    private class LocationInfo {
+        private double latitude;
+        private double longitude;
+
+        public LocationInfo(double latitude, double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
     }
 }
 
