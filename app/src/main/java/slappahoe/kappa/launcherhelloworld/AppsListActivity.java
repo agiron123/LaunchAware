@@ -1,9 +1,11 @@
 package slappahoe.kappa.launcherhelloworld;
 
 import android.app.Activity;
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -56,6 +58,11 @@ public class AppsListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_apps_list);
+
+        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+        Drawable wallpaper = wallpaperManager.peekDrawable();
+        wallpaper.setAlpha(128);
+        getWindow().setBackgroundDrawable(wallpaper);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);

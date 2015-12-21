@@ -28,20 +28,10 @@ public class LauncherHomeActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         //TODO: Get the current wallpaper to show in the background.
-        /*
+
         final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
         Drawable wallpaper = wallpaperManager.peekDrawable();
-
-        Toast.makeText(getApplicationContext(), "LauncherHomeActivity onCreate", Toast.LENGTH_LONG);
-
-        if (wallpaper != null) {
-            Toast.makeText(getApplicationContext(), "Wallpaper NOT NULL", Toast.LENGTH_SHORT);
-            RelativeLayout rLayout = (RelativeLayout) findViewById (R.id.home_view);
-            rLayout.setBackground(wallpaper);
-        } else {
-            Toast.makeText(getApplicationContext(), "Wallpaper NULL", Toast.LENGTH_SHORT);
-        }
-        */
+        getWindow().setBackgroundDrawable(wallpaper);
 
         //Requires a change in the minimum sdk
         setContentView(R.layout.activity_launcher_home);
