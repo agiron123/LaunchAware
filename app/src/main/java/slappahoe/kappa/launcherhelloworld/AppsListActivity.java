@@ -47,6 +47,9 @@ public class AppsListActivity extends Activity {
             if(context.getPackageManager().getLaunchIntentForPackage(installedApps.get(i).packageName) != null){
                 //If you're here, then this is a launch-able app
                 launchableInstalledApps.add(installedApps.get(i));
+
+                Log.d("AppsListActivity", installedApps.get(i).packageName);
+
             }
         }
         return launchableInstalledApps;
