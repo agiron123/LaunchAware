@@ -39,6 +39,19 @@ public class AppsListActivity extends Activity {
     private Location currentLocation;
     private LocationListener locationListener;
 
+    //http://stackoverflow.com/questions/12692870/filter-out-non-launchable-apps-when-getting-all-installed-apps
+    public static List<ApplicationInfo> getAllInstalledApplications(Context context) {
+        List<ApplicationInfo> installedApps = context.getPackageManager().getInstalledApplications(PackageManager.PERMISSION_GRANTED);
+        List<ApplicationInfo> launchableInstalledApps = new ArrayList<ApplicationInfo>();
+        for(int i =0; i<installedApps.size(); i++){
+            if(context.getPackageManager().getLaunchIntentForPackage(installedApps.get(i).packageName) != null){
+                //If you're here, then this is a launch-able app
+                launchableInstalledApps.add(installedApps.get(i));
+            }
+        }
+        return launchableInstalledApps;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,25 +75,10 @@ public class AppsListActivity extends Activity {
             public void onProviderDisabled(String s) {}
         };
 
-
         final String TAG = "AppsListActivity";
         final PackageManager packageManager = getPackageManager();
 
-        //get a list of installed apps.
-        final List<ApplicationInfo> packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
-
-
-        ArrayList<ApplicationInfo> installedApps = new ArrayList<>();
-        //remove apps that are not launchable from the list
-        //TODO: Figure out how to do this without having to create another list.
-
-        for (ApplicationInfo app: packages) {
-            if (packageManager.getLaunchIntentForPackage(app.packageName) != null)
-                installedApps.add(app);
-        }
-
-        //only show launchable apps in the launcher.
-        //if (context.getPackageManager().getLaunchIntentForPackage(pkg) != null)
+        final List<ApplicationInfo> installedApps = getAllInstalledApplications(getApplicationContext());
 
         GridView gridview = (GridView) findViewById(R.id.gridView);
         gridview.setVerticalScrollBarEnabled(false);
@@ -89,6 +87,8 @@ public class AppsListActivity extends Activity {
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
+                Toast.makeText(getApplicationContext(), "Clicked: " + position, Toast.LENGTH_SHORT);
+
                 getLocationUpdate();
                 Date now = new Date();
                 Log.d("AppsListActivity", "Now: " + now.toString());
@@ -100,8 +100,7 @@ public class AppsListActivity extends Activity {
                 }
 
                 Log.d("AppsListActivity", "Ssid: " + ssid);
-
-                String packageName = packages.get(position).packageName;
+                String packageName = installedApps.get(position).packageName;
                 AppInfo info;
                 if (currentLocation != null) {
                     info = new AppInfo(packageName,currentLocation.getLatitude(), currentLocation.getLongitude(), ssid);
@@ -113,7 +112,7 @@ public class AppsListActivity extends Activity {
                 String infoPrettyPrint = gson.toJson(info);
                 Log.d("AppsListActivity", "AppInfo: " + infoPrettyPrint);
 
-                startActivity(packageManager.getLaunchIntentForPackage(packages.get(position).packageName));
+                startActivity(packageManager.getLaunchIntentForPackage(packageName));
             }
         });
     }

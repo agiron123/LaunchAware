@@ -1,8 +1,9 @@
 package slappahoe.kappa.launcherhelloworld;
 
 import android.app.Activity;
+import android.app.WallpaperManager;
 import android.content.Intent;
-import android.support.v4.view.MotionEventCompat;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -10,6 +11,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 public class LauncherHomeActivity extends Activity {
 
@@ -24,6 +27,23 @@ public class LauncherHomeActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        //TODO: Get the current wallpaper to show in the background.
+        /*
+        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+        Drawable wallpaper = wallpaperManager.peekDrawable();
+
+        Toast.makeText(getApplicationContext(), "LauncherHomeActivity onCreate", Toast.LENGTH_LONG);
+
+        if (wallpaper != null) {
+            Toast.makeText(getApplicationContext(), "Wallpaper NOT NULL", Toast.LENGTH_SHORT);
+            RelativeLayout rLayout = (RelativeLayout) findViewById (R.id.home_view);
+            rLayout.setBackground(wallpaper);
+        } else {
+            Toast.makeText(getApplicationContext(), "Wallpaper NULL", Toast.LENGTH_SHORT);
+        }
+        */
+
+        //Requires a change in the minimum sdk
         setContentView(R.layout.activity_launcher_home);
 
         final Button appMenuButton = (Button) findViewById(R.id.appMenuButton);
@@ -44,7 +64,7 @@ public class LauncherHomeActivity extends Activity {
     @Override
     public boolean onTouchEvent(MotionEvent event){
 
-        int action = MotionEventCompat.getActionMasked(event);
+        int action  = event.getActionMasked();
 
         switch(action) {
             //User just tapped on the screen
