@@ -43,12 +43,10 @@ public class LauncherHomeActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        //TODO: Get the current wallpaper to show in the background.
 
         final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
         Drawable wallpaper = wallpaperManager.peekDrawable();
         getWindow().setBackgroundDrawable(wallpaper);
-
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
