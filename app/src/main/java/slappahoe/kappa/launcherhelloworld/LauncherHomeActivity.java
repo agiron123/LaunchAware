@@ -76,17 +76,6 @@ public class LauncherHomeActivity extends Activity {
                 startActivity(getApplicationContext().getPackageManager().getLaunchIntentForPackage(packageName));
             }
         });
-
-
-        /*
-        final Button appMenuButton = (Button) findViewById(R.id.appMenuButton);
-        appMenuButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Perform action on click
-                showApps(v);
-            }
-        }); */
-
     }
 
     //Load Favorite applications. For now, just show the first four apps in the package manager list.
