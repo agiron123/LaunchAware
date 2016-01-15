@@ -2,7 +2,6 @@ package slappahoe.kappa.launcherhelloworld.utils;
 
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class FavoriteAppsBuilder {
     private static final String CHROME_APP = "com.android.chrome";
 
     public void buildFavoriteApps(Context ctx, List<String> favoriteApps){
-        SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+//        SharedPreferences settings = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 //        if (!settings.contains(FAVORITE_ONE)) {
 //            favoriteApps.add(DIALER_APP);
 //        }
@@ -34,11 +33,9 @@ public class FavoriteAppsBuilder {
 //        if (!settings.contains(FAVORITE_FOUR)) {
 //            favoriteApps.add(CHROME_APP);
 //        }
-//        favoriteApps.add(DIALER_APP);
-//        favoriteApps.add(MESSAGING_APP);
-//        favoriteApps.add(MAPS_APP);
-//        favoriteApps.add(CHROME_APP);
-        favoriteApps.add("com.plutonium.gt_protecht");
-
+        favoriteApps.add(DIALER_APP);
+        favoriteApps.add(MESSAGING_APP);
+        favoriteApps.add(MAPS_APP);
+        favoriteApps.add(CHROME_APP);
     }
 }

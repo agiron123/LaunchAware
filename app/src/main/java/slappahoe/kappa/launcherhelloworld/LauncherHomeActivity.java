@@ -2,19 +2,17 @@ package slappahoe.kappa.launcherhelloworld;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
+import android.widget.ImageView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,13 +48,18 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
         /* Views */
         View mainLayoutView = findViewById(R.id.home_view);
         GridView gridView = (GridView) findViewById(R.id.favorites_view);
+        ImageView appGridImage = (ImageView) findViewById(R.id.app_grid_image);
+        appGridImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAppsList();
+            }
+        });
 
         mainLayoutView.setBackground(wallpaperDrawable);
 
         gridView.setAdapter(gridAdapter);
         gridView.setOnItemClickListener(this);
-
-        showAppsList();
     }
 
     private void initApplicationInfos() {
@@ -120,11 +123,4 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
 //                return super.onTouchEvent(event);
 //        }
 //    }
-//
-//    public View.OnClickListener showAppsListener = new View.OnClickListener() {
-//        @Override
-//        public void onClick(View view) {
-//            showApps(view);
-//        }
-//    };
 }
