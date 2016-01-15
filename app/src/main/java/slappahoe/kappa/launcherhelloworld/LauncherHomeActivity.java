@@ -9,12 +9,9 @@ import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -62,7 +59,7 @@ public class LauncherHomeActivity extends Activity {
         setContentView(R.layout.activity_launcher_home);
         final List<ApplicationInfo> favorites = getFavoriteApps(getApplicationContext());
 
-        GridView gridView = (GridView) findViewById(R.id.favoritesView);
+        GridView gridView = (GridView) findViewById(R.id.favorites_view);
 
         gridView.setVerticalScrollBarEnabled(false);
         gridView.setAdapter(new GridAdapter(this, favorites));
@@ -139,26 +136,4 @@ public class LauncherHomeActivity extends Activity {
             showApps(view);
         }
     };
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_launcher_home, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

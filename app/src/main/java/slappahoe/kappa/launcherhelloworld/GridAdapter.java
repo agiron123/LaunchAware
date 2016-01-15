@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -49,11 +48,11 @@ public class GridAdapter extends BaseAdapter {
             convertView = layoutInflater.inflate(R.layout.grid_item, parent, false);
         }
 
-        ImageView icon = (ImageView) convertView.findViewById(R.id.appIcon);
+        ImageView icon = (ImageView) convertView.findViewById(R.id.app_icon);
         Drawable appIcon = packageManager.getApplicationIcon(packages.get(position));
         icon.setImageDrawable(appIcon);
 
-        TextView appName = (TextView) convertView.findViewById(R.id.appName);
+        TextView appName = (TextView) convertView.findViewById(R.id.app_name);
         appName.setText(packageManager.getApplicationLabel(packages.get(position)));
 
         return convertView;

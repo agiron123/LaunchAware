@@ -8,17 +8,13 @@
     android:id="@+id/home_view">
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/favoritesView"
-        android:layout_width="fill_parent"
-        android:layout_height="75dp"
+        android:id="@+id/favorites_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/home_grid_height"
+        android:columnWidth="@dimen/home_grid_column_width"
         android:numColumns="auto_fit"
-        android:columnWidth="75dp"
-        android:horizontalSpacing="10dp"
-        android:verticalSpacing="10dp"
-        android:gravity="center"
-        android:stretchMode="columnWidth"
+        android:background="@android:color/black"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

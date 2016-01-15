@@ -6,9 +6,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -16,8 +13,6 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -37,9 +32,9 @@ public class AppsListActivity extends Activity {
     private ImageView imageView;
     private View homeView;
     private String DEBUG_TAG = "AppsListActivity";
-    private LocationManager locationManager;
-    private Location currentLocation;
-    private LocationListener locationListener;
+//    private LocationManager locationManager;
+//    private Location currentLocation;
+//    private LocationListener locationListener;
 
     //http://stackoverflow.com/questions/12692870/filter-out-non-launchable-apps-when-getting-all-installed-apps
     public static List<ApplicationInfo> getAllInstalledApplications(Context context) {
@@ -67,30 +62,30 @@ public class AppsListActivity extends Activity {
         wallpaper.setAlpha(128);
         getWindow().setBackgroundDrawable(wallpaper);
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                currentLocation = location;
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {}
-
-            @Override
-            public void onProviderEnabled(String s) {}
-
-            @Override
-            public void onProviderDisabled(String s) {}
-        };
+//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        locationListener = new LocationListener() {
+//            @Override
+//            public void onLocationChanged(Location location) {
+//                currentLocation = location;
+//            }
+//
+//            @Override
+//            public void onStatusChanged(String s, int i, Bundle bundle) {}
+//
+//            @Override
+//            public void onProviderEnabled(String s) {}
+//
+//            @Override
+//            public void onProviderDisabled(String s) {}
+//        };
 
         final String TAG = "AppsListActivity";
         final PackageManager packageManager = getPackageManager();
 
         final List<ApplicationInfo> installedApps = getAllInstalledApplications(getApplicationContext());
 
-        GridView gridview = (GridView) findViewById(R.id.gridView);
+        GridView gridview = (GridView) findViewById(R.id.grid_view);
         gridview.setVerticalScrollBarEnabled(false);
         gridview.setAdapter(new GridAdapter(this, installedApps));
 
@@ -99,7 +94,7 @@ public class AppsListActivity extends Activity {
                                     int position, long id) {
                 Toast.makeText(getApplicationContext(), "Clicked: " + position, Toast.LENGTH_SHORT);
 
-                getLocationUpdate();
+//                getLocationUpdate();
                 Date now = new Date();
                 Log.d("AppsListActivity", "Now: " + now.toString());
                 String ssid = getCurrentSsid(getApplicationContext());
@@ -112,11 +107,13 @@ public class AppsListActivity extends Activity {
                 Log.d("AppsListActivity", "Ssid: " + ssid);
                 String packageName = installedApps.get(position).packageName;
                 AppInfo info;
-                if (currentLocation != null) {
-                    info = new AppInfo(packageName,currentLocation.getLatitude(), currentLocation.getLongitude(), ssid);
-                } else {
-                    info = new AppInfo(packageName);
-                }
+//                if (currentLocation != null) {
+//                    info = new AppInfo(packageName,currentLocation.getLatitude(), currentLocation.getLongitude(), ssid);
+//                } else {
+//                    info = new AppInfo(packageName);
+//                }
+                info = new AppInfo(packageName);
+
 
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 String infoPrettyPrint = gson.toJson(info);
@@ -127,38 +124,16 @@ public class AppsListActivity extends Activity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_apps_list, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void getLocationUpdate() {
-        //TODO: Get location from best provider (network or GPS)
-        //Might also want to do something like poll location every 15 minutes or so, so as not to be
-        //so harsh on the battery.
-        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
-        if (currentLocation != null) {
-            Toast.makeText(getApplicationContext(), "lat: " + currentLocation.getLatitude() +
-                    " lon: " + currentLocation.getLongitude(), Toast.LENGTH_LONG).show();
-        }
-    }
+//    public void getLocationUpdate() {
+//        //TODO: Get location from best provider (network or GPS)
+//        //Might also want to do something like poll location every 15 minutes or so, so as not to be
+//        //so harsh on the battery.
+//        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+//        if (currentLocation != null) {
+//            Toast.makeText(getApplicationContext(), "lat: " + currentLocation.getLatitude() +
+//                    " lon: " + currentLocation.getLongitude(), Toast.LENGTH_LONG).show();
+//        }
+//    }
 
     //copied from: http://stackoverflow.com/questions/8811315/how-to-get-current-wifi-connection-info-in-android
     public static String getCurrentSsid(Context context) {
