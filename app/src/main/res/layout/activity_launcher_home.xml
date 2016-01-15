@@ -15,7 +15,6 @@
         android:layout_height="@dimen/home_grid_height"
         android:columnWidth="@dimen/home_grid_column_width"
         android:numColumns="auto_fit"
-        android:background="@android:color/black"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
 

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,13 +18,15 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LauncherHomeActivity extends Activity {
-    public static final String PREFS_NAME = "LaunchAwarePrefs";
+import slappahoe.kappa.launcherhelloworld.utils.FavoriteAppsBuilder;
+
+public class LauncherHomeActivity extends Activity implements AdapterView.OnItemClickListener{
     private final String DEBUG_TAG = "LauncherHomeActiviy";
     private float xInitial = 0;
     private float yInitial = 0;
 
-    private String[] favorites = new String[4];
+    private List<String> favoriteApps;
+    private List<ApplicationInfo> applicationInfos;
 
     //Y distance threshold for swipe down gesture to be recognized.
     private final float swipeThreshold = 100;
@@ -36,65 +39,51 @@ public class LauncherHomeActivity extends Activity {
         final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
         final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
 
+        applicationInfos = new ArrayList<>();
+        favoriteApps = new ArrayList<>();
+        FavoriteAppsBuilder favoriteAppsBuilder = new FavoriteAppsBuilder();
+        favoriteAppsBuilder.buildFavoriteApps(this, favoriteApps);
+        initApplicationInfos();
+
+        GridAdapter gridAdapter = new GridAdapter(this, applicationInfos);
+
         /* Views */
         View mainLayoutView = findViewById(R.id.home_view);
+        GridView gridView = (GridView) findViewById(R.id.favorites_view);
+
         mainLayoutView.setBackground(wallpaperDrawable);
 
-//        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-//
-//        if (!settings.contains("favorite0")) {
-//            favorites[0] = "com.google.android.dialer";
-//        }
-//
-//        if (!settings.contains("favorite1")) {
-//            favorites[1] = "com.google.android.apps.messaging";
-//        }
-//
-//        if (!settings.contains("favorite2")) {
-//            favorites[2] = "com.google.android.gm";
-//        }
-//
-//        if (!settings.contains("favorite3")) {
-//            favorites[3] = "com.android.chrome";
-//        }
+        gridView.setAdapter(gridAdapter);
+        gridView.setOnItemClickListener(this);
 
-        //Requires a change in the minimum sdk
-//        final List<ApplicationInfo> favorites = getFavoriteApps(getApplicationContext());
-//
-//        GridView gridView = (GridView) findViewById(R.id.favorites_view);
-//
-//        gridView.setVerticalScrollBarEnabled(false);
-//        gridView.setAdapter(new GridAdapter(this, favorites));
-//
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            public void onItemClick(AdapterView<?> parent, View v,
-//                                    int position, long id) {
-//                Toast.makeText(getApplicationContext(), "Clicked: " + position, Toast.LENGTH_SHORT);
-//
-//                String packageName = favorites.get(position).packageName;
-//                startActivity(getApplicationContext().getPackageManager().getLaunchIntentForPackage(packageName));
-//            }
-//        });
+        showAppsList();
     }
 
-    //Load Favorite applications. For now, just show the first four apps in the package manager list.
-//    public List<ApplicationInfo> getFavoriteApps(Context context) {
-//        ArrayList<ApplicationInfo> favoritesList = new ArrayList<>();
-//        try {
-//            for (int i = 0; i < favorites.length; i++) {
-//                favoritesList.add(context.getPackageManager().getApplicationInfo(favorites[i], 0));
-//            }
-//        } catch (Exception e) {
-//            Log.d("LauncherHomeActivity", e.getStackTrace().toString());
-//        }
-//
-//        return favoritesList;
-//    }
+    private void initApplicationInfos() {
+        try {
+            for (int i = 0; i < favoriteApps.size(); i++) {
+                applicationInfos.add(getPackageManager().getApplicationInfo(favoriteApps.get(i), 0));
+            }
+        }
+        catch (PackageManager.NameNotFoundException e){
+            Log.d("LauncherHomeActivity", e.getMessage());
+        }
+        catch (Exception e) {
+            Log.d("LauncherHomeActivity", e.getMessage());
+        }
+    }
 
-//    public void showApps(View view) {
-//        Intent i = new Intent(this, AppsListActivity.class);
-//        startActivity(i);
-//    }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String packageName = favoriteApps.get(position);
+        startActivity(getApplicationContext()
+                .getPackageManager().getLaunchIntentForPackage(packageName));
+    }
+
+    private void showAppsList(){
+        Intent i = new Intent(this, AppsListActivity.class);
+        startActivity(i);
+    }
 
 //    @Override
 //    public boolean onTouchEvent(MotionEvent event) {
