@@ -1,9 +1,6 @@
-package slappahoe.kappa.launcherhelloworld;
+package slappahoe.kappa.launcherhelloworld.models;
 import java.util.Date;
 
-/**
- * Created by andre on 6/21/15.
- */
 
 public class AppInfo {
 

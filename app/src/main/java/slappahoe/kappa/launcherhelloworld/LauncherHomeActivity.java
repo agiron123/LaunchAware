@@ -30,110 +30,112 @@ public class LauncherHomeActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_launcher_home);
 
-        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
-        Drawable wallpaper = wallpaperManager.peekDrawable();
-        getWindow().setBackgroundDrawable(wallpaper);
+        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+        final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
 
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        /* Views */
+        View mainLayoutView = findViewById(R.id.home_view);
+        mainLayoutView.setBackground(wallpaperDrawable);
 
-        if (!settings.contains("favorite0")) {
-            favorites[0] = "com.google.android.dialer";
-        }
-
-        if (!settings.contains("favorite1")) {
-            favorites[1] = "com.google.android.apps.messaging";
-        }
-
-        if (!settings.contains("favorite2")) {
-            favorites[2] = "com.google.android.gm";
-        }
-
-        if (!settings.contains("favorite3")) {
-            favorites[3] = "com.android.chrome";
-        }
+//        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+//
+//        if (!settings.contains("favorite0")) {
+//            favorites[0] = "com.google.android.dialer";
+//        }
+//
+//        if (!settings.contains("favorite1")) {
+//            favorites[1] = "com.google.android.apps.messaging";
+//        }
+//
+//        if (!settings.contains("favorite2")) {
+//            favorites[2] = "com.google.android.gm";
+//        }
+//
+//        if (!settings.contains("favorite3")) {
+//            favorites[3] = "com.android.chrome";
+//        }
 
         //Requires a change in the minimum sdk
-        setContentView(R.layout.activity_launcher_home);
-        final List<ApplicationInfo> favorites = getFavoriteApps(getApplicationContext());
-
-        GridView gridView = (GridView) findViewById(R.id.favorites_view);
-
-        gridView.setVerticalScrollBarEnabled(false);
-        gridView.setAdapter(new GridAdapter(this, favorites));
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Toast.makeText(getApplicationContext(), "Clicked: " + position, Toast.LENGTH_SHORT);
-
-                String packageName = favorites.get(position).packageName;
-                startActivity(getApplicationContext().getPackageManager().getLaunchIntentForPackage(packageName));
-            }
-        });
+//        final List<ApplicationInfo> favorites = getFavoriteApps(getApplicationContext());
+//
+//        GridView gridView = (GridView) findViewById(R.id.favorites_view);
+//
+//        gridView.setVerticalScrollBarEnabled(false);
+//        gridView.setAdapter(new GridAdapter(this, favorites));
+//
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            public void onItemClick(AdapterView<?> parent, View v,
+//                                    int position, long id) {
+//                Toast.makeText(getApplicationContext(), "Clicked: " + position, Toast.LENGTH_SHORT);
+//
+//                String packageName = favorites.get(position).packageName;
+//                startActivity(getApplicationContext().getPackageManager().getLaunchIntentForPackage(packageName));
+//            }
+//        });
     }
 
     //Load Favorite applications. For now, just show the first four apps in the package manager list.
-    public List<ApplicationInfo> getFavoriteApps(Context context) {
-        ArrayList<ApplicationInfo> favoritesList = new ArrayList<>();
-        try {
-            for (int i = 0; i < favorites.length; i++) {
-                favoritesList.add(context.getPackageManager().getApplicationInfo(favorites[i], 0));
-            }
-        } catch (Exception e) {
-            Log.d("LauncherHomeActivity", e.getStackTrace().toString());
-        }
+//    public List<ApplicationInfo> getFavoriteApps(Context context) {
+//        ArrayList<ApplicationInfo> favoritesList = new ArrayList<>();
+//        try {
+//            for (int i = 0; i < favorites.length; i++) {
+//                favoritesList.add(context.getPackageManager().getApplicationInfo(favorites[i], 0));
+//            }
+//        } catch (Exception e) {
+//            Log.d("LauncherHomeActivity", e.getStackTrace().toString());
+//        }
+//
+//        return favoritesList;
+//    }
 
-        return favoritesList;
-    }
+//    public void showApps(View view) {
+//        Intent i = new Intent(this, AppsListActivity.class);
+//        startActivity(i);
+//    }
 
-    public void showApps(View view) {
-        Intent i = new Intent(this, AppsListActivity.class);
-        startActivity(i);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
-        int action = event.getActionMasked();
-
-        switch (action) {
-            //User just tapped on the screen
-            case (MotionEvent.ACTION_DOWN): {
-                xInitial = event.getX();
-                yInitial = event.getY();
-
-                Log.d(DEBUG_TAG, "Down, XInit: " + xInitial + " YInit: " + yInitial);
-                return true;
-            }
-
-            //User moved finger
-            case (MotionEvent.ACTION_MOVE): {
-
-                return true;
-            }
-
-            //User just lifted finger off of screen
-            case (MotionEvent.ACTION_UP): {
-                if (event.getY() - yInitial >= swipeThreshold) {
-                    Log.d(DEBUG_TAG, "yDist: " + (event.getY() - yInitial));
-                    Intent i = new Intent(this, AppsListActivity.class);
-                    startActivity(i);
-                }
-                return true;
-            }
-
-            default:
-                return super.onTouchEvent(event);
-        }
-    }
-
-    public View.OnClickListener showAppsListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            showApps(view);
-        }
-    };
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//
+//        int action = event.getActionMasked();
+//
+//        switch (action) {
+//            //User just tapped on the screen
+//            case (MotionEvent.ACTION_DOWN): {
+//                xInitial = event.getX();
+//                yInitial = event.getY();
+//
+//                Log.d(DEBUG_TAG, "Down, XInit: " + xInitial + " YInit: " + yInitial);
+//                return true;
+//            }
+//
+//            //User moved finger
+//            case (MotionEvent.ACTION_MOVE): {
+//
+//                return true;
+//            }
+//
+//            //User just lifted finger off of screen
+//            case (MotionEvent.ACTION_UP): {
+//                if (event.getY() - yInitial >= swipeThreshold) {
+//                    Log.d(DEBUG_TAG, "yDist: " + (event.getY() - yInitial));
+//                    Intent i = new Intent(this, AppsListActivity.class);
+//                    startActivity(i);
+//                }
+//                return true;
+//            }
+//
+//            default:
+//                return super.onTouchEvent(event);
+//        }
+//    }
+//
+//    public View.OnClickListener showAppsListener = new View.OnClickListener() {
+//        @Override
+//        public void onClick(View view) {
+//            showApps(view);
+//        }
+//    };
 }

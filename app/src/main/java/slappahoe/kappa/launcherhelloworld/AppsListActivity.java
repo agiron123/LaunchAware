@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import slappahoe.kappa.launcherhelloworld.models.AppInfo;
+
 
 public class AppsListActivity extends Activity {
 
