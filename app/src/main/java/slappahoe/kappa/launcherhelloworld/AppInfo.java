@@ -5,6 +5,7 @@ import java.util.Date;
  * Created by andre on 6/21/15.
  */
 
+//TODO: Move to models package when code is refactored.
 public class AppInfo {
 
     private String packageName;
@@ -31,6 +32,10 @@ public class AppInfo {
 
     public void setBluetoothNetwork(String bluetoothNetwork) {
         this.bluetoothNetwork = bluetoothNetwork;
+    }
+
+    public String getBluetoothNetwork() {
+        return this.bluetoothNetwork;
     }
 
     public String getWifiSSId() {

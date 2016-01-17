@@ -2,9 +2,12 @@ package slappahoe.kappa.launcherhelloworld;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -22,7 +25,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -97,8 +99,6 @@ public class AppsListActivity extends Activity {
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Toast.makeText(getApplicationContext(), "Clicked: " + position, Toast.LENGTH_SHORT);
-
                 getLocationUpdate();
                 Date now = new Date();
                 Log.d("AppsListActivity", "Now: " + now.toString());
@@ -121,6 +121,86 @@ public class AppsListActivity extends Activity {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 String infoPrettyPrint = gson.toJson(info);
                 Log.d("AppsListActivity", "AppInfo: " + infoPrettyPrint);
+
+                //TODO: Close database connection based on application lifecycle.
+                //Insert the app launch information into database:
+                AppInfoDbHelper appInfoDbHelper = new AppInfoDbHelper(getApplicationContext());
+                SQLiteDatabase db = appInfoDbHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+
+                try {
+                    values.put(AppInfoContract.AppInfoEntry.COL_NAME_PACKAGE_NAME, info.getPackageName());
+                    values.put(AppInfoContract.AppInfoEntry.COL_NAME_NAME, info.getName());
+                    values.put(AppInfoContract.AppInfoEntry.COL_NAME_WIFI_SSID, info.getWifiSSId());
+                    values.put(AppInfoContract.AppInfoEntry.COL_NAME_BLUETOOTH, info.getBluetoothNetwork());
+                    values.put(AppInfoContract.AppInfoEntry.COL_NAME_LATITUDE, currentLocation.getLatitude());
+                    values.put(AppInfoContract.AppInfoEntry.COL_NAME_LONGITUDE, currentLocation.getLongitude());
+                    values.put(AppInfoContract.AppInfoEntry.COL_NAME_LAUNCH_TIME, new Date().getTime());
+
+                    // Insert the new row, returning the primary key value of the new row
+                    long newRowId;
+                    newRowId = db.insert(
+                            AppInfoContract.AppInfoEntry.TABLE_NAME,
+                            null,
+                            values);
+                }
+                catch (Exception e) {
+                    Log.d("Exception: ", e.getMessage());
+                }
+
+                //Read back out from the database:
+                AppInfoDbHelper dbReaderHelper = new AppInfoDbHelper(getApplicationContext());
+                SQLiteDatabase dbReadable = appInfoDbHelper.getReadableDatabase();
+
+                String [] columns = {
+                        AppInfoContract.AppInfoEntry.COL_NAME_PACKAGE_NAME,
+                        AppInfoContract.AppInfoEntry.COL_NAME_NAME,
+                        AppInfoContract.AppInfoEntry.COL_NAME_WIFI_SSID,
+                        AppInfoContract.AppInfoEntry.COL_NAME_BLUETOOTH,
+                        AppInfoContract.AppInfoEntry.COL_NAME_LATITUDE,
+                        AppInfoContract.AppInfoEntry.COL_NAME_LONGITUDE,
+                        AppInfoContract.AppInfoEntry.COL_NAME_LAUNCH_TIME
+                };
+
+                try {
+                    Cursor c = db.query(
+                            AppInfoContract.AppInfoEntry.TABLE_NAME,  // The table to query
+                            columns,                               // The columns to return
+                            null,                                // The columns for the WHERE clause
+                            null,                            // The values for the WHERE clause
+                            null,                                     // don't group the rows
+                            null,                                     // don't filter by row groups
+                            null                                 // The sort order
+                    );
+                    if (c != null){
+                        //Cursors are lazy loaded, get the first item in the cursor.
+                        c.moveToFirst();
+                        //Reading out all entries from the database.
+                        while (!c.isAfterLast()){
+                            String appPackageName = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_PACKAGE_NAME));
+                            Log.d("AppsListActivity", "DB Read: PackageName: " +  appPackageName);
+                            String appName = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_NAME));
+                            Log.d("AppsListActivity", "DB Read: App Name: " +  appName);
+                            String wifiSSID = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_WIFI_SSID));
+                            Log.d("AppsListActivity", "DB Read: SSID: " + wifiSSID);
+                            String bluetoothNetwork = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_BLUETOOTH));
+                            Log.d("AppsListActivity", "DB Read: Bluetooth: " + bluetoothNetwork);
+                            String appLatitude = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_LATITUDE));
+                            Log.d("AppsListActivity", "DB Read: Latitude " + appLatitude);
+                            String appLongitude = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_LONGITUDE));
+                            Log.d("AppsListActivity", "DB Read: Longitude: " + appLongitude);
+
+                            long launchTime = c.getLong(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_LAUNCH_TIME));
+                            Date launchDateTime = new Date(launchTime);
+                            Log.d("AppsListActivity", "DB Read: Launch Time: " + launchDateTime.toString());
+
+                            c.moveToNext();
+                        }
+                    }
+                }
+                catch(Exception e) {
+                    Log.d("Exception: ",  e.getMessage().toString());
+                }
 
                 startActivity(packageManager.getLaunchIntentForPackage(packageName));
             }
@@ -151,16 +231,11 @@ public class AppsListActivity extends Activity {
 
     public void getLocationUpdate() {
         //TODO: Get location from best provider (network or GPS)
-        //Might also want to do something like poll location every 15 minutes or so, so as not to be
-        //so harsh on the battery.
+        //TODO: Consider polling every x minutes to save battery.
         locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
-        if (currentLocation != null) {
-            Toast.makeText(getApplicationContext(), "lat: " + currentLocation.getLatitude() +
-                    " lon: " + currentLocation.getLongitude(), Toast.LENGTH_LONG).show();
-        }
     }
 
-    //copied from: http://stackoverflow.com/questions/8811315/how-to-get-current-wifi-connection-info-in-android
+    //Source: http://stackoverflow.com/questions/8811315/how-to-get-current-wifi-connection-info-in-android
     public static String getCurrentSsid(Context context) {
         String ssid = null;
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
