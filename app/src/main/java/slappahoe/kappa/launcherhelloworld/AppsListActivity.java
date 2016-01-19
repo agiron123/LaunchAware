@@ -1,5 +1,6 @@
 package slappahoe.kappa.launcherhelloworld;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -41,12 +43,15 @@ public class AppsListActivity extends Activity {
     private Location currentLocation;
     private LocationListener locationListener;
 
+    private static final int LOCATION_PERMISSION = 1;
+
     //http://stackoverflow.com/questions/12692870/filter-out-non-launchable-apps-when-getting-all-installed-apps
     public static List<ApplicationInfo> getAllInstalledApplications(Context context) {
-        List<ApplicationInfo> installedApps = context.getPackageManager().getInstalledApplications(PackageManager.PERMISSION_GRANTED);
+        List<ApplicationInfo> installedApps = context.getPackageManager().
+                getInstalledApplications(PackageManager.PERMISSION_GRANTED);
         List<ApplicationInfo> launchableInstalledApps = new ArrayList<ApplicationInfo>();
-        for(int i =0; i<installedApps.size(); i++){
-            if(context.getPackageManager().getLaunchIntentForPackage(installedApps.get(i).packageName) != null){
+        for (int i = 0; i < installedApps.size(); i++) {
+            if (context.getPackageManager().getLaunchIntentForPackage(installedApps.get(i).packageName) != null) {
                 //If you're here, then this is a launch-able app
                 launchableInstalledApps.add(installedApps.get(i));
 
@@ -68,6 +73,17 @@ public class AppsListActivity extends Activity {
         getWindow().setBackgroundDrawable(wallpaper);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSION);
+            return;
+        }
         currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         locationListener = new LocationListener() {
             @Override
@@ -76,13 +92,16 @@ public class AppsListActivity extends Activity {
             }
 
             @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {}
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+            }
 
             @Override
-            public void onProviderEnabled(String s) {}
+            public void onProviderEnabled(String s) {
+            }
 
             @Override
-            public void onProviderDisabled(String s) {}
+            public void onProviderDisabled(String s) {
+            }
         };
 
         final String TAG = "AppsListActivity";
@@ -113,7 +132,7 @@ public class AppsListActivity extends Activity {
                 String packageName = installedApps.get(position).packageName;
                 AppInfo info;
                 if (currentLocation != null) {
-                    info = new AppInfo(packageName,currentLocation.getLatitude(), currentLocation.getLongitude(), ssid);
+                    info = new AppInfo(packageName, currentLocation.getLatitude(), currentLocation.getLongitude(), ssid);
                 } else {
                     info = new AppInfo(packageName);
                 }
@@ -133,6 +152,14 @@ public class AppsListActivity extends Activity {
         //TODO: Get location from best provider (network or GPS)
         //Might also want to do something like poll location every 15 minutes or so, so as not to be
         //so harsh on the battery.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION);
+            return;
+        }
         locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
         if (currentLocation != null) {
             Toast.makeText(getApplicationContext(), "lat: " + currentLocation.getLatitude() +
@@ -144,7 +171,7 @@ public class AppsListActivity extends Activity {
     public static String getCurrentSsid(Context context) {
         String ssid = null;
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
         if (networkInfo.isConnected()) {
             final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             final WifiInfo connectionInfo = wifiManager.getConnectionInfo();
@@ -153,5 +180,10 @@ public class AppsListActivity extends Activity {
             }
         }
         return ssid;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

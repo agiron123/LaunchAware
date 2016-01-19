@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +51,7 @@ public class GridAdapter extends BaseAdapter {
 
         ImageView icon = (ImageView) convertView.findViewById(R.id.app_icon);
         Drawable appIcon = packageManager.getApplicationIcon(packages.get(position));
-        icon.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
+        icon.setImageDrawable(ContextCompat.getDrawable(context, R.mipmap.ic_launcher));
 
         TextView appName = (TextView) convertView.findViewById(R.id.app_name);
         appName.setText(packageManager.getApplicationLabel(packages.get(position)));
