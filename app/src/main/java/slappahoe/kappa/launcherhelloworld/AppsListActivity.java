@@ -28,6 +28,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -47,11 +49,12 @@ public class AppsListActivity extends Activity {
 
     //http://stackoverflow.com/questions/12692870/filter-out-non-launchable-apps-when-getting-all-installed-apps
     public static List<ApplicationInfo> getAllInstalledApplications(Context context) {
-        List<ApplicationInfo> installedApps = context.getPackageManager().
-                getInstalledApplications(PackageManager.PERMISSION_GRANTED);
+        final PackageManager pm = context.getPackageManager();
+        List<ApplicationInfo> installedApps =
+                pm.getInstalledApplications(PackageManager.PERMISSION_GRANTED);
         List<ApplicationInfo> launchableInstalledApps = new ArrayList<ApplicationInfo>();
         for (int i = 0; i < installedApps.size(); i++) {
-            if (context.getPackageManager().getLaunchIntentForPackage(installedApps.get(i).packageName) != null) {
+            if (pm.getLaunchIntentForPackage(installedApps.get(i).packageName) != null) {
                 //If you're here, then this is a launch-able app
                 launchableInstalledApps.add(installedApps.get(i));
 
@@ -59,6 +62,14 @@ public class AppsListActivity extends Activity {
 
             }
         }
+
+        Collections.sort(launchableInstalledApps, new Comparator<ApplicationInfo>() {
+            @Override
+            public int compare(ApplicationInfo lhs, ApplicationInfo rhs) {
+                return pm.getApplicationLabel(lhs).toString()
+                        .compareToIgnoreCase(pm.getApplicationLabel(rhs).toString());
+            }
+        });
         return launchableInstalledApps;
     }
 
