@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -34,9 +37,9 @@ public class AppsListActivity extends Activity {
     private ImageView imageView;
     private View homeView;
     private String DEBUG_TAG = "AppsListActivity";
-//    private LocationManager locationManager;
-//    private Location currentLocation;
-//    private LocationListener locationListener;
+    private LocationManager locationManager;
+    private Location currentLocation;
+    private LocationListener locationListener;
 
     //http://stackoverflow.com/questions/12692870/filter-out-non-launchable-apps-when-getting-all-installed-apps
     public static List<ApplicationInfo> getAllInstalledApplications(Context context) {
@@ -64,23 +67,23 @@ public class AppsListActivity extends Activity {
         wallpaper.setAlpha(128);
         getWindow().setBackgroundDrawable(wallpaper);
 
-//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        locationListener = new LocationListener() {
-//            @Override
-//            public void onLocationChanged(Location location) {
-//                currentLocation = location;
-//            }
-//
-//            @Override
-//            public void onStatusChanged(String s, int i, Bundle bundle) {}
-//
-//            @Override
-//            public void onProviderEnabled(String s) {}
-//
-//            @Override
-//            public void onProviderDisabled(String s) {}
-//        };
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                currentLocation = location;
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {}
+
+            @Override
+            public void onProviderEnabled(String s) {}
+
+            @Override
+            public void onProviderDisabled(String s) {}
+        };
 
         final String TAG = "AppsListActivity";
         final PackageManager packageManager = getPackageManager();
@@ -96,7 +99,7 @@ public class AppsListActivity extends Activity {
                                     int position, long id) {
                 Toast.makeText(getApplicationContext(), "Clicked: " + position, Toast.LENGTH_SHORT);
 
-//                getLocationUpdate();
+                getLocationUpdate();
                 Date now = new Date();
                 Log.d("AppsListActivity", "Now: " + now.toString());
                 String ssid = getCurrentSsid(getApplicationContext());
@@ -109,11 +112,11 @@ public class AppsListActivity extends Activity {
                 Log.d("AppsListActivity", "Ssid: " + ssid);
                 String packageName = installedApps.get(position).packageName;
                 AppInfo info;
-//                if (currentLocation != null) {
-//                    info = new AppInfo(packageName,currentLocation.getLatitude(), currentLocation.getLongitude(), ssid);
-//                } else {
-//                    info = new AppInfo(packageName);
-//                }
+                if (currentLocation != null) {
+                    info = new AppInfo(packageName,currentLocation.getLatitude(), currentLocation.getLongitude(), ssid);
+                } else {
+                    info = new AppInfo(packageName);
+                }
                 info = new AppInfo(packageName);
 
 
@@ -126,16 +129,16 @@ public class AppsListActivity extends Activity {
         });
     }
 
-//    public void getLocationUpdate() {
-//        //TODO: Get location from best provider (network or GPS)
-//        //Might also want to do something like poll location every 15 minutes or so, so as not to be
-//        //so harsh on the battery.
-//        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
-//        if (currentLocation != null) {
-//            Toast.makeText(getApplicationContext(), "lat: " + currentLocation.getLatitude() +
-//                    " lon: " + currentLocation.getLongitude(), Toast.LENGTH_LONG).show();
-//        }
-//    }
+    public void getLocationUpdate() {
+        //TODO: Get location from best provider (network or GPS)
+        //Might also want to do something like poll location every 15 minutes or so, so as not to be
+        //so harsh on the battery.
+        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+        if (currentLocation != null) {
+            Toast.makeText(getApplicationContext(), "lat: " + currentLocation.getLatitude() +
+                    " lon: " + currentLocation.getLongitude(), Toast.LENGTH_LONG).show();
+        }
+    }
 
     //copied from: http://stackoverflow.com/questions/8811315/how-to-get-current-wifi-connection-info-in-android
     public static String getCurrentSsid(Context context) {

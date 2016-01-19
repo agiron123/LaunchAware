@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -79,7 +80,7 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String packageName = favoriteApps.get(position);
-        startActivity(getApplicationContext()
+            startActivity(getApplicationContext()
                 .getPackageManager().getLaunchIntentForPackage(packageName));
     }
 
@@ -88,39 +89,39 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
         startActivity(i);
     }
 
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//
-//        int action = event.getActionMasked();
-//
-//        switch (action) {
-//            //User just tapped on the screen
-//            case (MotionEvent.ACTION_DOWN): {
-//                xInitial = event.getX();
-//                yInitial = event.getY();
-//
-//                Log.d(DEBUG_TAG, "Down, XInit: " + xInitial + " YInit: " + yInitial);
-//                return true;
-//            }
-//
-//            //User moved finger
-//            case (MotionEvent.ACTION_MOVE): {
-//
-//                return true;
-//            }
-//
-//            //User just lifted finger off of screen
-//            case (MotionEvent.ACTION_UP): {
-//                if (event.getY() - yInitial >= swipeThreshold) {
-//                    Log.d(DEBUG_TAG, "yDist: " + (event.getY() - yInitial));
-//                    Intent i = new Intent(this, AppsListActivity.class);
-//                    startActivity(i);
-//                }
-//                return true;
-//            }
-//
-//            default:
-//                return super.onTouchEvent(event);
-//        }
-//    }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        int action = event.getActionMasked();
+
+        switch (action) {
+            //User just tapped on the screen
+            case (MotionEvent.ACTION_DOWN): {
+                xInitial = event.getX();
+                yInitial = event.getY();
+
+                Log.d(DEBUG_TAG, "Down, XInit: " + xInitial + " YInit: " + yInitial);
+                return true;
+            }
+
+            //User moved finger
+            case (MotionEvent.ACTION_MOVE): {
+
+                return true;
+            }
+
+            //User just lifted finger off of screen
+            case (MotionEvent.ACTION_UP): {
+                if (event.getY() - yInitial >= swipeThreshold) {
+                    Log.d(DEBUG_TAG, "yDist: " + (event.getY() - yInitial));
+                    Intent i = new Intent(this, AppsListActivity.class);
+                    startActivity(i);
+                }
+                return true;
+            }
+
+            default:
+                return super.onTouchEvent(event);
+        }
+    }
 }

@@ -50,7 +50,6 @@ public class GridAdapter extends BaseAdapter {
 
         ImageView icon = (ImageView) convertView.findViewById(R.id.app_icon);
         Drawable appIcon = packageManager.getApplicationIcon(packages.get(position));
-//        icon.setImageDrawable(appIcon);
         icon.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
 
         TextView appName = (TextView) convertView.findViewById(R.id.app_name);
