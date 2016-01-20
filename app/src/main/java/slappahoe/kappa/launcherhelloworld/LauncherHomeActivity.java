@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,8 +69,6 @@ public class LauncherHomeActivity extends Activity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Toast.makeText(getApplicationContext(), "Clicked: " + position, Toast.LENGTH_SHORT);
-
                 String packageName = favorites.get(position).packageName;
                 startActivity(getApplicationContext().getPackageManager().getLaunchIntentForPackage(packageName));
             }
