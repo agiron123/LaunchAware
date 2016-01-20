@@ -1,5 +1,6 @@
 package slappahoe.kappa.launcherhelloworld;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ContentValues;
@@ -17,21 +18,25 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
+import slappahoe.kappa.launcherhelloworld.models.AppInfo;
 
 
 public class AppsListActivity extends Activity {
@@ -43,12 +48,16 @@ public class AppsListActivity extends Activity {
     private Location currentLocation;
     private LocationListener locationListener;
 
+    private static final int LOCATION_PERMISSION = 1;
+
     //http://stackoverflow.com/questions/12692870/filter-out-non-launchable-apps-when-getting-all-installed-apps
     public static List<ApplicationInfo> getAllInstalledApplications(Context context) {
-        List<ApplicationInfo> installedApps = context.getPackageManager().getInstalledApplications(PackageManager.PERMISSION_GRANTED);
+        final PackageManager pm = context.getPackageManager();
+        List<ApplicationInfo> installedApps =
+                pm.getInstalledApplications(PackageManager.PERMISSION_GRANTED);
         List<ApplicationInfo> launchableInstalledApps = new ArrayList<ApplicationInfo>();
-        for(int i =0; i<installedApps.size(); i++){
-            if(context.getPackageManager().getLaunchIntentForPackage(installedApps.get(i).packageName) != null){
+        for (int i = 0; i < installedApps.size(); i++) {
+            if (pm.getLaunchIntentForPackage(installedApps.get(i).packageName) != null) {
                 //If you're here, then this is a launch-able app
                 launchableInstalledApps.add(installedApps.get(i));
 
@@ -56,6 +65,14 @@ public class AppsListActivity extends Activity {
 
             }
         }
+
+        Collections.sort(launchableInstalledApps, new Comparator<ApplicationInfo>() {
+            @Override
+            public int compare(ApplicationInfo lhs, ApplicationInfo rhs) {
+                return pm.getApplicationLabel(lhs).toString()
+                        .compareToIgnoreCase(pm.getApplicationLabel(rhs).toString());
+            }
+        });
         return launchableInstalledApps;
     }
 
@@ -70,6 +87,17 @@ public class AppsListActivity extends Activity {
         getWindow().setBackgroundDrawable(wallpaper);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSION);
+            return;
+        }
         currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         locationListener = new LocationListener() {
             @Override
@@ -78,13 +106,16 @@ public class AppsListActivity extends Activity {
             }
 
             @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {}
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+            }
 
             @Override
-            public void onProviderEnabled(String s) {}
+            public void onProviderEnabled(String s) {
+            }
 
             @Override
-            public void onProviderDisabled(String s) {}
+            public void onProviderDisabled(String s) {
+            }
         };
 
         final String TAG = "AppsListActivity";
@@ -92,7 +123,7 @@ public class AppsListActivity extends Activity {
 
         final List<ApplicationInfo> installedApps = getAllInstalledApplications(getApplicationContext());
 
-        GridView gridview = (GridView) findViewById(R.id.gridView);
+        GridView gridview = (GridView) findViewById(R.id.grid_view);
         gridview.setVerticalScrollBarEnabled(false);
         gridview.setAdapter(new GridAdapter(this, installedApps));
 
@@ -113,10 +144,11 @@ public class AppsListActivity extends Activity {
                 String packageName = installedApps.get(position).packageName;
                 AppInfo info;
                 if (currentLocation != null) {
-                    info = new AppInfo(packageName,currentLocation.getLatitude(), currentLocation.getLongitude(), ssid);
+                    info = new AppInfo(packageName, currentLocation.getLatitude(), currentLocation.getLongitude(), ssid);
                 } else {
                     info = new AppInfo(packageName);
                 }
+                info = new AppInfo(packageName);
 
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 String infoPrettyPrint = gson.toJson(info);
@@ -206,31 +238,18 @@ public class AppsListActivity extends Activity {
             }
         });
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_apps_list, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     public void getLocationUpdate() {
         //TODO: Get location from best provider (network or GPS)
+        //Might also want to do something like poll location every 15 minutes or so, so as not to be
+        //so harsh on the battery.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION);
+            return;
+        }
         //TODO: Consider polling every x minutes to save battery.
         locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
     }
@@ -239,7 +258,7 @@ public class AppsListActivity extends Activity {
     public static String getCurrentSsid(Context context) {
         String ssid = null;
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
         if (networkInfo.isConnected()) {
             final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             final WifiInfo connectionInfo = wifiManager.getConnectionInfo();
@@ -248,5 +267,10 @@ public class AppsListActivity extends Activity {
             }
         }
         return ssid;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
