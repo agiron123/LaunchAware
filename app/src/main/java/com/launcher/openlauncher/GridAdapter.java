@@ -1,23 +1,21 @@
-package slappahoe.kappa.launcherhelloworld;
+package com.launcher.openlauncher;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
 
-/**
+import slappahoe.kappa.openlauncher.R;
 
- * Created by andre on 6/21/15.
- */
+
 public class GridAdapter extends BaseAdapter {
     private Context context;
 
@@ -30,14 +28,17 @@ public class GridAdapter extends BaseAdapter {
         this.packageManager = context.getPackageManager();
     }
 
+    @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
+    @Override
     public int getCount() {
         return packages.size();
     }
 
+    @Override
     public Object getItem(int i) {
         return null;
     }
@@ -45,15 +46,14 @@ public class GridAdapter extends BaseAdapter {
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
             convertView = layoutInflater.inflate(R.layout.grid_item, parent, false);
         }
 
-        ImageView icon = (ImageView) convertView.findViewById(R.id.appIcon);
-        Drawable appIcon = packageManager.getApplicationIcon(packages.get(position));
-        icon.setImageDrawable(appIcon);
+        ImageView icon = (ImageView) convertView.findViewById(R.id.app_icon);
+        icon.setImageDrawable(ContextCompat.getDrawable(context, R.mipmap.ic_launcher));
 
-        TextView appName = (TextView) convertView.findViewById(R.id.appName);
+        TextView appName = (TextView) convertView.findViewById(R.id.app_name);
         appName.setText(packageManager.getApplicationLabel(packages.get(position)));
 
         return convertView;
