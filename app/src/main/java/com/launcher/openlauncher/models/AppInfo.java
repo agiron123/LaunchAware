@@ -1,4 +1,4 @@
-package slappahoe.kappa.launcherhelloworld.models;
+package com.launcher.openlauncher.models;
 import java.util.Date;
 
 

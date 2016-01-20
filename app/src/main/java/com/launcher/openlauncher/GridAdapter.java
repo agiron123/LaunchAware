@@ -1,9 +1,8 @@
-package slappahoe.kappa.launcherhelloworld;
+package com.launcher.openlauncher;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
+
+import slappahoe.kappa.openlauncher.R;
 
 
 public class GridAdapter extends BaseAdapter {
@@ -50,7 +51,6 @@ public class GridAdapter extends BaseAdapter {
         }
 
         ImageView icon = (ImageView) convertView.findViewById(R.id.app_icon);
-        Drawable appIcon = packageManager.getApplicationIcon(packages.get(position));
         icon.setImageDrawable(ContextCompat.getDrawable(context, R.mipmap.ic_launcher));
 
         TextView appName = (TextView) convertView.findViewById(R.id.app_name);

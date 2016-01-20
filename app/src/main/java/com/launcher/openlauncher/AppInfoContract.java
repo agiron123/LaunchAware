@@ -1,8 +1,6 @@
-package slappahoe.kappa.launcherhelloworld;
+package com.launcher.openlauncher;
 
 import android.provider.BaseColumns;
-
-import java.sql.Date;
 
 /**
  * Created by andre on 1/12/16.

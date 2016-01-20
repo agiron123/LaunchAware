@@ -1,4 +1,4 @@
-package slappahoe.kappa.launcherhelloworld;
+package com.launcher.openlauncher;
 
 import android.Manifest;
 import android.app.Activity;
@@ -24,8 +24,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,14 +34,14 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import slappahoe.kappa.launcherhelloworld.models.AppInfo;
+import slappahoe.kappa.openlauncher.R;
+
+import com.launcher.openlauncher.models.AppInfo;
 
 
 public class AppsListActivity extends Activity {
 
-    private ImageView imageView;
-    private View homeView;
-    private String DEBUG_TAG = "AppsListActivity";
+    private static final String LOG_TAG = AppsListActivity.class.getSimpleName();
     private LocationManager locationManager;
     private Location currentLocation;
     private LocationListener locationListener;
@@ -61,7 +59,7 @@ public class AppsListActivity extends Activity {
                 //If you're here, then this is a launch-able app
                 launchableInstalledApps.add(installedApps.get(i));
 
-                Log.d("AppsListActivity", installedApps.get(i).packageName);
+                Log.d(LOG_TAG, installedApps.get(i).packageName);
 
             }
         }
@@ -118,10 +116,9 @@ public class AppsListActivity extends Activity {
             }
         };
 
-        final String TAG = "AppsListActivity";
         final PackageManager packageManager = getPackageManager();
-
-        final List<ApplicationInfo> installedApps = getAllInstalledApplications(getApplicationContext());
+        final List<ApplicationInfo> installedApps =
+                getAllInstalledApplications(getApplicationContext());
 
         GridView gridview = (GridView) findViewById(R.id.grid_view);
         gridview.setVerticalScrollBarEnabled(false);

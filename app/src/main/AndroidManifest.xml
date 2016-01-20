@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="slappahoe.kappa.launcherhelloworld">
+    package="slappahoe.kappa.openlauncher">
     <uses-sdk android:minSdkVersion="16" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".LauncherHomeActivity"
+            android:name="com.launcher.openlauncher.LauncherHomeActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:stateNotNeeded="true" >
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AppsListActivity"
+            android:name="com.launcher.openlauncher.AppsListActivity"
             android:label="@string/title_activity_apps_list" >
         </activity>
     </application>

@@ -1,4 +1,4 @@
-package slappahoe.kappa.launcherhelloworld.utils;
+package com.launcher.openlauncher;
 
 
 import android.content.Context;
@@ -14,6 +14,7 @@ public class FavoriteAppsBuilder {
     private static final String FAVORITE_THREE = "favorite3";
     private static final String FAVORITE_FOUR = "favorite4";
 
+    // Replace these with default for the phone, not hardcoded apps
     private static final String DIALER_APP = "com.google.android.dialer";
     private static final String MESSAGING_APP = "com.google.android.apps.messaging";
     private static final String MAPS_APP = "com.google.android.gm";

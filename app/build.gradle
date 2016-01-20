@@ -5,7 +5,7 @@ android {
     buildToolsVersion '23.0.1'
 
     defaultConfig {
-        applicationId "slappahoe.kappa.launcherhelloworld"
+        applicationId "com.launcher.openlauncher"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1

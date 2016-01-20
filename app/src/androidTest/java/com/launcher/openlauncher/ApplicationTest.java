@@ -1,4 +1,4 @@
-package slappahoe.kappa.launcherhelloworld;
+package com.launcher.openlauncher;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

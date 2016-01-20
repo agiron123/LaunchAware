@@ -1,10 +1,9 @@
-package slappahoe.kappa.launcherhelloworld;
+package com.launcher.openlauncher;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,7 +16,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-import slappahoe.kappa.launcherhelloworld.utils.FavoriteAppsBuilder;
+import slappahoe.kappa.openlauncher.R;
 
 public class LauncherHomeActivity extends Activity implements AdapterView.OnItemClickListener{
     private final String DEBUG_TAG = "LauncherHomeActiviy";
@@ -60,20 +59,6 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
 
         gridView.setAdapter(gridAdapter);
         gridView.setOnItemClickListener(this);
-    }
-
-    private void initApplicationInfos() {
-        try {
-            for (int i = 0; i < favoriteApps.size(); i++) {
-                applicationInfos.add(getPackageManager().getApplicationInfo(favoriteApps.get(i), 0));
-            }
-        }
-        catch (PackageManager.NameNotFoundException e){
-            Log.d("LauncherHomeActivity", e.getMessage());
-        }
-        catch (Exception e) {
-            Log.d("LauncherHomeActivity", e.getMessage());
-        }
     }
 
     @Override
