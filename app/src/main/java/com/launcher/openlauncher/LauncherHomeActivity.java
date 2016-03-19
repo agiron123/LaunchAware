@@ -18,7 +18,7 @@ import java.util.List;
 
 import slappahoe.kappa.openlauncher.R;
 
-public class LauncherHomeActivity extends Activity implements AdapterView.OnItemClickListener{
+public class LauncherHomeActivity extends Activity implements AdapterView.OnItemClickListener {
     private final String DEBUG_TAG = "LauncherHomeActiviy";
     private float xInitial = 0;
     private float yInitial = 0;
@@ -46,7 +46,7 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
 
         /* Views */
         View mainLayoutView = findViewById(R.id.home_view);
-        GridView gridView = (GridView) findViewById(R.id.favorites_view);
+        GridView gridView = (GridView) findViewById(R.id.favorites_view_one);
         ImageView appGridImage = (ImageView) findViewById(R.id.app_grid_image);
         appGridImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,11 +64,11 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String packageName = favoriteApps.get(position);
-            startActivity(getApplicationContext()
+        startActivity(getApplicationContext()
                 .getPackageManager().getLaunchIntentForPackage(packageName));
     }
 
-    private void showAppsList(){
+    private void showAppsList() {
         Intent i = new Intent(this, AppsListActivity.class);
         startActivity(i);
     }
