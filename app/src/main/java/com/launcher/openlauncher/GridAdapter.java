@@ -3,7 +3,6 @@ package com.launcher.openlauncher;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,8 @@ import slappahoe.kappa.openlauncher.R;
 
 
 public class GridAdapter extends BaseAdapter {
-    private Context context;
 
+    private Context context;
     private List<ApplicationInfo> packages;
     private PackageManager packageManager;
 
@@ -50,11 +49,12 @@ public class GridAdapter extends BaseAdapter {
             convertView = layoutInflater.inflate(R.layout.grid_item, parent, false);
         }
 
+        ApplicationInfo applicationInfo = packages.get(position);
         ImageView icon = (ImageView) convertView.findViewById(R.id.app_icon);
-        icon.setImageDrawable(ContextCompat.getDrawable(context, R.mipmap.ic_launcher));
+        icon.setImageDrawable(applicationInfo.loadIcon(packageManager));
 
         TextView appName = (TextView) convertView.findViewById(R.id.app_name);
-        appName.setText(packageManager.getApplicationLabel(packages.get(position)));
+        appName.setText(packageManager.getApplicationLabel(applicationInfo));
 
         return convertView;
     }
