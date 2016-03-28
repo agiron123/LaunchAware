@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,14 +13,23 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import slappahoe.kappa.openlauncher.R;
 
-public class LauncherHomeActivity extends Activity implements AdapterView.OnItemClickListener{
+public class LauncherHomeActivity extends Activity implements AdapterView.OnItemClickListener {
+
+    @Bind(R.id.home_view)
+    View mainLayoutView;
+    @Bind(R.id.favorites_view_one)
+    GridView gridView;
+
+
     private final String DEBUG_TAG = "LauncherHomeActiviy";
     private float xInitial = 0;
     private float yInitial = 0;
@@ -45,30 +56,24 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
         GridAdapter gridAdapter = new GridAdapter(this, applicationInfos);
 
         /* Views */
-        View mainLayoutView = findViewById(R.id.home_view);
-        GridView gridView = (GridView) findViewById(R.id.favorites_view);
-        ImageView appGridImage = (ImageView) findViewById(R.id.app_grid_image);
-        appGridImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAppsList();
-            }
-        });
+        ButterKnife.bind(this);
 
         mainLayoutView.setBackground(wallpaperDrawable);
-
         gridView.setAdapter(gridAdapter);
         gridView.setOnItemClickListener(this);
+
+        loadApps();
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String packageName = favoriteApps.get(position);
-            startActivity(getApplicationContext()
+        startActivity(getApplicationContext()
                 .getPackageManager().getLaunchIntentForPackage(packageName));
     }
 
-    private void showAppsList(){
+    @OnClick(R.id.app_grid_image)
+    public void showAppsList() {
         Intent i = new Intent(this, AppsListActivity.class);
         startActivity(i);
     }
@@ -107,5 +112,20 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
             default:
                 return super.onTouchEvent(event);
         }
+    }
+
+    private void loadApps() {
+        Intent i = (new Intent(Intent.ACTION_DIAL));
+        PackageManager pm = getPackageManager();
+        final ResolveInfo mInfo = pm.resolveActivity(i, 0);
+
+        View view = View.inflate(this, R.layout.grid_item, null);
+//        ImageView imageView = (ImageView) view.findViewById(R.id.app_icon);
+//        imageView.setImageDrawable(mInfo.loadIcon(pm));
+//        TextView textView = (TextView) view.findViewById(R.id.app_name);
+//        textView.setText(mInfo.loadLabel(pm));
+//
+//        gridView.addView(view);
+//        Toast.makeText(this, pm.getApplicationLabel(mInfo.activityInfo.applicationInfo), Toast.LENGTH_LONG).show();
     }
 }
