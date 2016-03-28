@@ -11,7 +11,8 @@ public final class AppInfoContract {
 
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor.
-    public AppInfoContract() {}
+    public AppInfoContract() {
+    }
 
     /* Inner class that defines the table contents */
     public static abstract class AppInfoEntry implements BaseColumns {

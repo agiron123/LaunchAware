@@ -12,7 +12,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
+import android.widget.GridLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,9 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
     @Bind(R.id.home_view)
     View mainLayoutView;
     @Bind(R.id.favorites_view_one)
-    GridView gridView;
+    GridLayout gridOne;
+    @Bind(R.id.favorites_view_two)
+    GridLayout gridTwo;
 
 
     private final String DEBUG_TAG = "LauncherHomeActiviy";
@@ -59,8 +63,8 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
         ButterKnife.bind(this);
 
         mainLayoutView.setBackground(wallpaperDrawable);
-        gridView.setAdapter(gridAdapter);
-        gridView.setOnItemClickListener(this);
+//        gridOne.setAdapter(gridAdapter);
+//        gridOne.setOnItemClickListener(this);
 
         loadApps();
     }
@@ -115,17 +119,57 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
     }
 
     private void loadApps() {
-        Intent i = (new Intent(Intent.ACTION_DIAL));
         PackageManager pm = getPackageManager();
-        final ResolveInfo mInfo = pm.resolveActivity(i, 0);
+        ImageView imageView;
+        TextView textView;
 
-        View view = View.inflate(this, R.layout.grid_item, null);
-//        ImageView imageView = (ImageView) view.findViewById(R.id.app_icon);
-//        imageView.setImageDrawable(mInfo.loadIcon(pm));
-//        TextView textView = (TextView) view.findViewById(R.id.app_name);
-//        textView.setText(mInfo.loadLabel(pm));
-//
-//        gridView.addView(view);
-//        Toast.makeText(this, pm.getApplicationLabel(mInfo.activityInfo.applicationInfo), Toast.LENGTH_LONG).show();
+        Intent i = (new Intent(Intent.ACTION_DIAL));
+        ResolveInfo phoneAppInfo = pm.resolveActivity(i, PackageManager.MATCH_DEFAULT_ONLY);
+        if (phoneAppInfo != null) {
+            View phoneAppView = View.inflate(this, R.layout.grid_item, null);
+            imageView = (ImageView) phoneAppView.findViewById(R.id.app_icon);
+            imageView.setImageDrawable(phoneAppInfo.loadIcon(pm));
+            textView = (TextView) phoneAppView.findViewById(R.id.app_name);
+            textView.setText(phoneAppInfo.loadLabel(pm));
+
+            gridOne.addView(phoneAppView);
+        }
+
+        i = (new Intent(Intent.ACTION_SEND));
+        i.setType(TEXT_SERVICES_MANAGER_SERVICE);
+        ResolveInfo messagesAppInfo = pm.resolveActivity(i, PackageManager.MATCH_DEFAULT_ONLY);
+        if (messagesAppInfo != null) {
+            View messagesAppView = View.inflate(this, R.layout.grid_item, null);
+            imageView = (ImageView) messagesAppView.findViewById(R.id.app_icon);
+            imageView.setImageDrawable(messagesAppInfo.loadIcon(pm));
+            textView = (TextView) messagesAppView.findViewById(R.id.app_name);
+            textView.setText(messagesAppInfo.loadLabel(pm));
+
+            gridOne.addView(messagesAppView);
+        }
+
+        i = (new Intent(Intent.ACTION_VIEW));
+        ResolveInfo browserAppInfo = pm.resolveActivity(i, 0);
+        if (browserAppInfo != null) {
+            View browserAppView = View.inflate(this, R.layout.grid_item, null);
+            imageView = (ImageView) browserAppView.findViewById(R.id.app_icon);
+            imageView.setImageDrawable(browserAppInfo.loadIcon(pm));
+            textView = (TextView) browserAppView.findViewById(R.id.app_name);
+            textView.setText(browserAppInfo.loadLabel(pm));
+
+            gridTwo.addView(browserAppView);
+        }
+
+        i = (new Intent(Intent.CATEGORY_APP_CONTACTS));
+        ResolveInfo contactsAppInfo = pm.resolveActivity(i, 0);
+        if (contactsAppInfo != null) {
+            View contactsAppView = View.inflate(this, R.layout.grid_item, null);
+            imageView = (ImageView) contactsAppView.findViewById(R.id.app_icon);
+            imageView.setImageDrawable(contactsAppInfo.loadIcon(pm));
+            textView = (TextView) contactsAppView.findViewById(R.id.app_name);
+            textView.setText(contactsAppInfo.loadLabel(pm));
+
+            gridTwo.addView(contactsAppView);
+        }
     }
 }
