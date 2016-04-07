@@ -23,10 +23,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.launcher.openlauncher.models.AppInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,17 +36,22 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import slappahoe.kappa.openlauncher.R;
-
-import com.launcher.openlauncher.models.AppInfo;
 
 
 public class AppsListActivity extends Activity {
+
+    @Bind(R.id.search_edit_text)
+    EditText mSearchEditText;
 
     private static final String LOG_TAG = AppsListActivity.class.getSimpleName();
     private LocationManager locationManager;
     private Location currentLocation;
     private LocationListener locationListener;
+
+    private boolean isSearching;
 
     private static final int LOCATION_PERMISSION = 1;
 
@@ -78,6 +85,15 @@ public class AppsListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_apps_list);
+
+        ButterKnife.bind(this);
+
+        if (savedInstanceState != null) {
+            isSearching = savedInstanceState.getBoolean(PrefsKey.SEARCHING_IN_GRID);
+            if (isSearching) {
+                mSearchEditText.requestFocus();
+            }
+        }
 
         final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
         Drawable wallpaper = wallpaperManager.peekDrawable();
@@ -172,8 +188,7 @@ public class AppsListActivity extends Activity {
                             AppInfoContract.AppInfoEntry.TABLE_NAME,
                             null,
                             values);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Log.d("Exception: ", e.getMessage());
                 }
 
@@ -181,7 +196,7 @@ public class AppsListActivity extends Activity {
                 AppInfoDbHelper dbReaderHelper = new AppInfoDbHelper(getApplicationContext());
                 SQLiteDatabase dbReadable = appInfoDbHelper.getReadableDatabase();
 
-                String [] columns = {
+                String[] columns = {
                         AppInfoContract.AppInfoEntry.COL_NAME_PACKAGE_NAME,
                         AppInfoContract.AppInfoEntry.COL_NAME_NAME,
                         AppInfoContract.AppInfoEntry.COL_NAME_WIFI_SSID,
@@ -201,15 +216,15 @@ public class AppsListActivity extends Activity {
                             null,                                     // don't filter by row groups
                             null                                 // The sort order
                     );
-                    if (c != null){
+                    if (c != null) {
                         //Cursors are lazy loaded, get the first item in the cursor.
                         c.moveToFirst();
                         //Reading out all entries from the database.
-                        while (!c.isAfterLast()){
+                        while (!c.isAfterLast()) {
                             String appPackageName = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_PACKAGE_NAME));
-                            Log.d("AppsListActivity", "DB Read: PackageName: " +  appPackageName);
+                            Log.d("AppsListActivity", "DB Read: PackageName: " + appPackageName);
                             String appName = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_NAME));
-                            Log.d("AppsListActivity", "DB Read: App Name: " +  appName);
+                            Log.d("AppsListActivity", "DB Read: App Name: " + appName);
                             String wifiSSID = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_WIFI_SSID));
                             Log.d("AppsListActivity", "DB Read: SSID: " + wifiSSID);
                             String bluetoothNetwork = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_BLUETOOTH));
@@ -226,15 +241,15 @@ public class AppsListActivity extends Activity {
                             c.moveToNext();
                         }
                     }
-                }
-                catch(Exception e) {
-                    Log.d("Exception: ",  e.getMessage().toString());
+                } catch (Exception e) {
+                    Log.d("Exception: ", e.getMessage().toString());
                 }
 
                 startActivity(packageManager.getLaunchIntentForPackage(packageName));
             }
         });
     }
+
     public void getLocationUpdate() {
         //TODO: Get location from best provider (network or GPS)
         //Might also want to do something like poll location every 15 minutes or so, so as not to be

@@ -17,31 +17,51 @@
         android:orientation="horizontal"
         android:weightSum="1">
 
-        <GridView
+        <GridLayout
             android:id="@+id/favorites_view_one"
             android:layout_width="0dp"
             android:layout_height="@dimen/home_grid_height"
             android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="0.4"
             android:columnWidth="@dimen/home_grid_column_width"
-            android:numColumns="2" />
+            android:numColumns="2"
+            android:useDefaultMargins="true" />
+        
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.05"/>
 
         <ImageView
             android:id="@+id/app_grid_image"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:layout_weight="0.2"
+            android:layout_weight="0.1"
             android:src="@mipmap/ic_grid_launcher" />
 
-        <GridView
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.05"/>
+
+        <GridLayout
             android:id="@+id/favorites_view_two"
             android:layout_width="0dp"
             android:layout_height="@dimen/home_grid_height"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="0.4"
             android:columnWidth="@dimen/home_grid_column_width"
-            android:numColumns="auto_fit" />
+            android:useDefaultMargins="true"
+            android:numColumns="2" />
 
     </LinearLayout>
 
