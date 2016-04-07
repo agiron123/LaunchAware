@@ -1,16 +1,28 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.launcher.openlauncher.AppsListActivity">
+
+    <EditText
+        android:id="@+id/search_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint="@string/search"
+        android:inputType="text"
+        android:background="@android:color/white"
+        android:textSize="14sp" />
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="auto_fit"
+        android:background="@android:color/black"
         android:columnWidth="@dimen/home_grid_column_width"
         android:horizontalSpacing="10dp"
-        android:verticalSpacing="10dp"
-        android:background="@android:color/black" />
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10dp" />
 
-</RelativeLayout>
+</LinearLayout>
