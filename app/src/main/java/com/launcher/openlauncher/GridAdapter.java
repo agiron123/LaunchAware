@@ -12,8 +12,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import slappahoe.kappa.openlauncher.R;
-
 
 public class GridAdapter extends BaseAdapter {
 

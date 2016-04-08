@@ -38,7 +38,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import slappahoe.kappa.openlauncher.R;
 
 
 public class AppsListActivity extends Activity {

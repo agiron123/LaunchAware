@@ -23,7 +23,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import slappahoe.kappa.openlauncher.R;
 
 public class LauncherHomeActivity extends Activity {
 

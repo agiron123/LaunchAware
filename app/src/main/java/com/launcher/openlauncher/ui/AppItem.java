@@ -9,9 +9,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.launcher.openlauncher.R;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import slappahoe.kappa.openlauncher.R;
 
 
 public class AppItem extends FrameLayout {
@@ -43,8 +44,10 @@ public class AppItem extends FrameLayout {
     }
 
     private void init() {
-        inflate(getContext(), R.layout.app_item, this);
-        ButterKnife.bind(this);
+        if (!isInEditMode()) {
+            inflate(getContext(), R.layout.app_item, this);
+            ButterKnife.bind(this);
+        }
     }
 
     public void setDisplay(Drawable appDrawable, String appName) {
