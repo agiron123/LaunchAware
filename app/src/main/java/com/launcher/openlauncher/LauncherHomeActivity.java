@@ -9,14 +9,13 @@ import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
+
+import com.launcher.openlauncher.ui.AppItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +25,18 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import slappahoe.kappa.openlauncher.R;
 
-public class LauncherHomeActivity extends Activity implements AdapterView.OnItemClickListener {
+public class LauncherHomeActivity extends Activity {
 
-    @Bind(R.id.home_view)
+    @Bind(R.id.main_layout_view)
     View mainLayoutView;
-    @Bind(R.id.favorites_view_one)
-    GridLayout gridOne;
-    @Bind(R.id.favorites_view_two)
-    GridLayout gridTwo;
+    @Bind(R.id.app_item_one)
+    AppItem mAppItemOne;
+    @Bind(R.id.app_item_two)
+    AppItem mAppitemTwo;
+    @Bind(R.id.app_item_three)
+    AppItem mAppItemThree;
+    @Bind(R.id.app_item_four)
+    AppItem mAppItemFour;
 
     public static final String SMS_DEFAULT_APPLICATION = "sms_default_application";
 
@@ -61,23 +64,10 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
         FavoriteAppsBuilder favoriteAppsBuilder = new FavoriteAppsBuilder();
         favoriteAppsBuilder.buildFavoriteApps(this, favoriteApps);
 
-        GridAdapter gridAdapter = new GridAdapter(this, applicationInfos);
-
         /* Views */
         ButterKnife.bind(this);
-
         mainLayoutView.setBackground(wallpaperDrawable);
-//        gridOne.setAdapter(gridAdapter);
-//        gridOne.setOnItemClickListener(this);
-
         loadApps();
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String packageName = favoriteApps.get(position);
-        startActivity(getApplicationContext()
-                .getPackageManager().getLaunchIntentForPackage(packageName));
     }
 
     @OnClick(R.id.app_grid_image)
@@ -125,26 +115,21 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
 
     private void loadApps() {
         final PackageManager pm = getPackageManager();
-        ImageView imageView;
-        TextView textView;
 
         // Phone
         final Intent phoneIntent = (new Intent(Intent.ACTION_DIAL));
-        ResolveInfo phoneAppInfo = pm.resolveActivity(phoneIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        final ResolveInfo phoneAppInfo = pm.resolveActivity(phoneIntent, PackageManager.MATCH_DEFAULT_ONLY);
         if (phoneIntent != null && phoneAppInfo != null) {
-            View phoneAppView = View.inflate(this, R.layout.grid_item, null);
-            imageView = (ImageView) phoneAppView.findViewById(R.id.app_icon);
-            imageView.setImageDrawable(phoneAppInfo.loadIcon(pm));
-            textView = (TextView) phoneAppView.findViewById(R.id.app_name);
-            textView.setText(phoneAppInfo.loadLabel(pm));
-
-            phoneAppView.setOnClickListener(new View.OnClickListener() {
+            mAppItemOne.setDisplay(phoneAppInfo.loadIcon(pm),
+                    phoneAppInfo.loadLabel(pm).toString());
+            mAppItemOne.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     startActivity(phoneIntent);
+//                    startActivity(getApplicationContext()
+//                            .getPackageManager().getLaunchIntentForPackage(phoneAppInfo.resolvePackageName));
                 }
             });
-            gridOne.addView(phoneAppView);
         }
 
         // Texting
@@ -153,38 +138,31 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
         ResolveInfo messagingAppInfo = pm.resolveActivity(messagingIntent, PackageManager.MATCH_DEFAULT_ONLY);
 
         if (messagingIntent != null && messagingAppInfo != null) {
-            View messagingAppView = View.inflate(this, R.layout.grid_item, null);
-            imageView = (ImageView) messagingAppView.findViewById(R.id.app_icon);
-            imageView.setImageDrawable(messagingAppInfo.loadIcon(pm));
-            textView = (TextView) messagingAppView.findViewById(R.id.app_name);
-            textView.setText(messagingAppInfo.loadLabel(pm));
-
-            messagingAppView.setOnClickListener(new View.OnClickListener() {
+            mAppitemTwo.setDisplay(messagingAppInfo.loadIcon(pm),
+                    messagingAppInfo.loadLabel(pm).toString());
+            mAppitemTwo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     startActivity(messagingIntent);
                 }
             });
-            gridOne.addView(messagingAppView);
         }
 
         // Contacts
-        final Intent contactsIntent = (new Intent(Intent.ACTION_DIAL));
-        ResolveInfo contactsAppInfo = pm.resolveActivity(phoneIntent, PackageManager.MATCH_DEFAULT_ONLY);
-        if (messagingIntent != null && contactsAppInfo != null) {
-            View contactsAppView = View.inflate(this, R.layout.grid_item, null);
-            imageView = (ImageView) contactsAppView.findViewById(R.id.app_icon);
-            imageView.setImageDrawable(contactsAppInfo.loadIcon(pm));
-            textView = (TextView) contactsAppView.findViewById(R.id.app_name);
-            textView.setText(contactsAppInfo.loadLabel(pm));
+        final Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+//        contactsIntent.setType(ContactsContract.Contacts.CONTENT_ITEM_TYPE);
 
-            contactsAppView.setOnClickListener(new View.OnClickListener() {
+        ResolveInfo contactsAppInfo = pm.resolveActivity(phoneIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (contactsIntent != null && contactsAppInfo != null) {
+            mAppItemThree.setDisplay(contactsAppInfo.loadIcon(pm),
+                    contactsAppInfo.loadLabel(pm).toString());
+            mAppItemThree.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     startActivity(contactsIntent);
+
                 }
             });
-            gridTwo.addView(contactsAppView);
         }
 
         // Browser
@@ -192,56 +170,14 @@ public class LauncherHomeActivity extends Activity implements AdapterView.OnItem
         final ResolveInfo browserAppInfo = pm.resolveActivity(browserIntent,
                 PackageManager.MATCH_DEFAULT_ONLY);
         if (browserIntent != null && browserAppInfo != null) {
-            View browserAppView = View.inflate(this, R.layout.grid_item, null);
-            imageView = (ImageView) browserAppView.findViewById(R.id.app_icon);
-            imageView.setImageDrawable(browserAppInfo.loadIcon(pm));
-            textView = (TextView) browserAppView.findViewById(R.id.app_name);
-            textView.setText(browserAppInfo.loadLabel(pm));
-
-            browserAppView.setOnClickListener(new View.OnClickListener() {
+            mAppItemFour.setDisplay(browserAppInfo.loadIcon(pm),
+                    browserAppInfo.loadLabel(pm).toString());
+            mAppItemFour.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     startActivity(browserIntent);
                 }
             });
-            gridTwo.addView(browserAppView);
         }
-//
-//        i = (new Intent(Intent.ACTION_SEND));
-//        i.setType(TEXT_SERVICES_MANAGER_SERVICE);
-//        ResolveInfo messagesAppInfo = pm.resolveActivity(i, PackageManager.MATCH_DEFAULT_ONLY);
-//        if (messagesAppInfo != null) {
-//            View messagesAppView = View.inflate(this, R.layout.grid_item, null);
-//            imageView = (ImageView) messagesAppView.findViewById(R.id.app_icon);
-//            imageView.setImageDrawable(messagesAppInfo.loadIcon(pm));
-//            textView = (TextView) messagesAppView.findViewById(R.id.app_name);
-//            textView.setText(messagesAppInfo.loadLabel(pm));
-//
-//            gridOne.addView(messagesAppView);
-//        }
-//
-//        i = (new Intent(Intent.ACTION_VIEW));
-//        ResolveInfo browserAppInfo = pm.resolveActivity(i, 0);
-//        if (browserAppInfo != null) {
-//            View browserAppView = View.inflate(this, R.layout.grid_item, null);
-//            imageView = (ImageView) browserAppView.findViewById(R.id.app_icon);
-//            imageView.setImageDrawable(browserAppInfo.loadIcon(pm));
-//            textView = (TextView) browserAppView.findViewById(R.id.app_name);
-//            textView.setText(browserAppInfo.loadLabel(pm));
-//
-//            gridTwo.addView(browserAppView);
-//        }
-//
-//        i = (new Intent(Intent.CATEGORY_APP_CONTACTS));
-//        ResolveInfo contactsAppInfo = pm.resolveActivity(i, 0);
-//        if (contactsAppInfo != null) {
-//            View contactsAppView = View.inflate(this, R.layout.grid_item, null);
-//            imageView = (ImageView) contactsAppView.findViewById(R.id.app_icon);
-//            imageView.setImageDrawable(contactsAppInfo.loadIcon(pm));
-//            textView = (TextView) contactsAppView.findViewById(R.id.app_name);
-//            textView.setText(contactsAppInfo.loadLabel(pm));
-//
-//            gridTwo.addView(contactsAppView);
-//        }
     }
 }

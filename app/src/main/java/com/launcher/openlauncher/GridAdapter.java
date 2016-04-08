@@ -46,7 +46,7 @@ public class GridAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(context);
-            convertView = layoutInflater.inflate(R.layout.grid_item, parent, false);
+            convertView = layoutInflater.inflate(R.layout.app_item, parent, false);
         }
 
         ApplicationInfo applicationInfo = packages.get(position);
