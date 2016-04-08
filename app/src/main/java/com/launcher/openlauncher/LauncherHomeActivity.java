@@ -3,7 +3,6 @@ package com.launcher.openlauncher;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
@@ -11,14 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.launcher.openlauncher.ui.AppItem;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -31,48 +26,32 @@ public class LauncherHomeActivity extends Activity {
     @Bind(R.id.app_item_one)
     AppItem mAppItemOne;
     @Bind(R.id.app_item_two)
-    AppItem mAppitemTwo;
+    AppItem mAppItemTwo;
     @Bind(R.id.app_item_three)
     AppItem mAppItemThree;
     @Bind(R.id.app_item_four)
     AppItem mAppItemFour;
 
-    public static final String SMS_DEFAULT_APPLICATION = "sms_default_application";
-
-
-    private final String DEBUG_TAG = "LauncherHomeActiviy";
-    private float xInitial = 0;
     private float yInitial = 0;
 
-    private List<String> favoriteApps;
-    private List<ApplicationInfo> applicationInfos;
-
-    //Y distance threshold for swipe down gesture to be recognized.
-    private final float swipeThreshold = 100;
-
+    public static final String SMS_DEFAULT_APPLICATION = "sms_default_application";
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher_home);
 
-        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-        final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
-
-        applicationInfos = new ArrayList<>();
-        favoriteApps = new ArrayList<>();
-        FavoriteAppsBuilder favoriteAppsBuilder = new FavoriteAppsBuilder();
-        favoriteAppsBuilder.buildFavoriteApps(this, favoriteApps);
-
-        /* Views */
         ButterKnife.bind(this);
+
+        final Drawable wallpaperDrawable = WallpaperManager.getInstance(this).getDrawable();
         mainLayoutView.setBackground(wallpaperDrawable);
+
         loadApps();
     }
 
     @OnClick(R.id.app_grid_image)
     public void showAppsList() {
-        Intent i = new Intent(this, AppsListActivity.class);
-        startActivity(i);
+        startActivity(new Intent(this, AppsListActivity.class));
     }
 
     @Override
@@ -83,10 +62,7 @@ public class LauncherHomeActivity extends Activity {
         switch (action) {
             //User just tapped on the screen
             case (MotionEvent.ACTION_DOWN): {
-                xInitial = event.getX();
                 yInitial = event.getY();
-
-                Log.d(DEBUG_TAG, "Down, XInit: " + xInitial + " YInit: " + yInitial);
                 return true;
             }
 
@@ -98,8 +74,8 @@ public class LauncherHomeActivity extends Activity {
 
             //User just lifted finger off of screen
             case (MotionEvent.ACTION_UP): {
+                float swipeThreshold = 100;
                 if (event.getY() - yInitial >= swipeThreshold) {
-                    Log.d(DEBUG_TAG, "yDist: " + (event.getY() - yInitial));
                     Intent i = new Intent(this, AppsListActivity.class);
                     i.putExtra(PrefsKey.SEARCHING_IN_GRID, true);
                     startActivity(i);
@@ -118,15 +94,13 @@ public class LauncherHomeActivity extends Activity {
         // Phone
         final Intent phoneIntent = (new Intent(Intent.ACTION_DIAL));
         final ResolveInfo phoneAppInfo = pm.resolveActivity(phoneIntent, PackageManager.MATCH_DEFAULT_ONLY);
-        if (phoneIntent != null && phoneAppInfo != null) {
+        if (phoneAppInfo != null) {
             mAppItemOne.setDisplay(phoneAppInfo.loadIcon(pm),
                     phoneAppInfo.loadLabel(pm).toString());
             mAppItemOne.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     startActivity(phoneIntent);
-//                    startActivity(getApplicationContext()
-//                            .getPackageManager().getLaunchIntentForPackage(phoneAppInfo.resolvePackageName));
                 }
             });
         }
@@ -136,10 +110,10 @@ public class LauncherHomeActivity extends Activity {
         final Intent messagingIntent = pm.getLaunchIntentForPackage(defaultApplication);
         ResolveInfo messagingAppInfo = pm.resolveActivity(messagingIntent, PackageManager.MATCH_DEFAULT_ONLY);
 
-        if (messagingIntent != null && messagingAppInfo != null) {
-            mAppitemTwo.setDisplay(messagingAppInfo.loadIcon(pm),
+        if (messagingAppInfo != null) {
+            mAppItemTwo.setDisplay(messagingAppInfo.loadIcon(pm),
                     messagingAppInfo.loadLabel(pm).toString());
-            mAppitemTwo.setOnClickListener(new View.OnClickListener() {
+            mAppItemTwo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     startActivity(messagingIntent);
@@ -149,10 +123,8 @@ public class LauncherHomeActivity extends Activity {
 
         // Contacts
         final Intent contactsIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-//        contactsIntent.setType(ContactsContract.Contacts.CONTENT_ITEM_TYPE);
-
         ResolveInfo contactsAppInfo = pm.resolveActivity(phoneIntent, PackageManager.MATCH_DEFAULT_ONLY);
-        if (contactsIntent != null && contactsAppInfo != null) {
+        if (contactsAppInfo != null) {
             mAppItemThree.setDisplay(contactsAppInfo.loadIcon(pm),
                     contactsAppInfo.loadLabel(pm).toString());
             mAppItemThree.setOnClickListener(new View.OnClickListener() {
@@ -168,7 +140,7 @@ public class LauncherHomeActivity extends Activity {
         final Intent browserIntent = new Intent("android.intent.action.VIEW", Uri.parse("http://"));
         final ResolveInfo browserAppInfo = pm.resolveActivity(browserIntent,
                 PackageManager.MATCH_DEFAULT_ONLY);
-        if (browserIntent != null && browserAppInfo != null) {
+        if (browserAppInfo != null) {
             mAppItemFour.setDisplay(browserAppInfo.loadIcon(pm),
                     browserAppInfo.loadLabel(pm).toString());
             mAppItemFour.setOnClickListener(new View.OnClickListener() {

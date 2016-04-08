@@ -19,7 +19,9 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,6 +31,8 @@ import android.widget.GridView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.launcher.openlauncher.models.AppInfo;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +44,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class AppsListActivity extends Activity {
+public class AppsListActivity extends Activity implements TextWatcher {
 
     @Bind(R.id.search_edit_text)
     EditText mSearchEditText;
@@ -55,28 +59,55 @@ public class AppsListActivity extends Activity {
     private static final int LOCATION_PERMISSION = 1;
 
     //http://stackoverflow.com/questions/12692870/filter-out-non-launchable-apps-when-getting-all-installed-apps
-    public static List<ApplicationInfo> getAllInstalledApplications(Context context) {
+    public static List<ApplicationInfo> getAllInstalledApplications(Context context,
+                                                                    final String searchText) {
         final PackageManager pm = context.getPackageManager();
         List<ApplicationInfo> installedApps =
                 pm.getInstalledApplications(PackageManager.PERMISSION_GRANTED);
-        List<ApplicationInfo> launchableInstalledApps = new ArrayList<ApplicationInfo>();
+
+        List<ApplicationInfo> launchableInstalledApps = new ArrayList<>();
         for (int i = 0; i < installedApps.size(); i++) {
             if (pm.getLaunchIntentForPackage(installedApps.get(i).packageName) != null) {
-                //If you're here, then this is a launch-able app
                 launchableInstalledApps.add(installedApps.get(i));
-
-                Log.d(LOG_TAG, installedApps.get(i).packageName);
-
             }
         }
 
-        Collections.sort(launchableInstalledApps, new Comparator<ApplicationInfo>() {
-            @Override
-            public int compare(ApplicationInfo lhs, ApplicationInfo rhs) {
-                return pm.getApplicationLabel(lhs).toString()
-                        .compareToIgnoreCase(pm.getApplicationLabel(rhs).toString());
+        if (StringUtils.isEmpty(searchText)) {
+            Collections.sort(launchableInstalledApps, new Comparator<ApplicationInfo>() {
+                @Override
+                public int compare(ApplicationInfo lhs, ApplicationInfo rhs) {
+                    return pm.getApplicationLabel(lhs).toString()
+                            .compareToIgnoreCase(pm.getApplicationLabel(rhs).toString());
+                }
+            });
+        } else {
+            Collections.sort(launchableInstalledApps, new Comparator<ApplicationInfo>() {
+                @Override
+                public int compare(ApplicationInfo lhs, ApplicationInfo rhs) {
+                    String leftString = pm.getApplicationLabel(lhs).toString();
+                    String rightString = pm.getApplicationLabel(rhs).toString();
+
+                    if (StringUtils.containsIgnoreCase(leftString, searchText) &&
+                            StringUtils.containsIgnoreCase(rightString, searchText))
+                        return leftString.compareToIgnoreCase(rightString);
+                    else if (StringUtils.containsIgnoreCase(leftString, searchText) &&
+                            !StringUtils.containsIgnoreCase(rightString, searchText))
+                        return -1;
+                    else if (!StringUtils.containsIgnoreCase(leftString, searchText) &&
+                            StringUtils.containsIgnoreCase(rightString, searchText))
+                        return 1;
+                    else
+                        return leftString.compareToIgnoreCase(rightString);
+                }
+            });
+            // Hide unmatched apps
+            List<ApplicationInfo> appsToRemove = new ArrayList<>();
+            for (ApplicationInfo applicationInfo : launchableInstalledApps) {
+                if (!StringUtils.containsIgnoreCase(pm.getApplicationLabel(applicationInfo).toString(), searchText))
+                    appsToRemove.add(applicationInfo);
             }
-        });
+            launchableInstalledApps.removeAll(appsToRemove);
+        }
         return launchableInstalledApps;
     }
 
@@ -93,6 +124,7 @@ public class AppsListActivity extends Activity {
                 mSearchEditText.requestFocus();
             }
         }
+        mSearchEditText.addTextChangedListener(this);
 
         final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
         Drawable wallpaper = wallpaperManager.peekDrawable();
@@ -131,9 +163,64 @@ public class AppsListActivity extends Activity {
             }
         };
 
+        reorderApps("");
+    }
+
+    public void getLocationUpdate() {
+        //TODO: Get location from best provider (network or GPS)
+        //Might also want to do something like poll location every 15 minutes or so, so as not to be
+        //so harsh on the battery.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION);
+            return;
+        }
+        //TODO: Consider polling every x minutes to save battery.
+        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+    }
+
+    //Source: http://stackoverflow.com/questions/8811315/how-to-get-current-wifi-connection-info-in-android
+    public static String getCurrentSsid(Context context) {
+        String ssid = null;
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+        if (networkInfo.isConnected()) {
+            final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            final WifiInfo connectionInfo = wifiManager.getConnectionInfo();
+            if (connectionInfo != null && !TextUtils.isEmpty(connectionInfo.getSSID())) {
+                ssid = connectionInfo.getSSID();
+            }
+        }
+        return ssid;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        reorderApps(s.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
+    private void reorderApps(String searchText) {
         final PackageManager packageManager = getPackageManager();
         final List<ApplicationInfo> installedApps =
-                getAllInstalledApplications(getApplicationContext());
+                getAllInstalledApplications(getApplicationContext(), searchText);
 
         GridView gridview = (GridView) findViewById(R.id.grid_view);
         gridview.setVerticalScrollBarEnabled(false);
@@ -144,7 +231,7 @@ public class AppsListActivity extends Activity {
                                     int position, long id) {
                 getLocationUpdate();
                 Date now = new Date();
-                Log.d("AppsListActivity", "Now: " + now.toString());
+                Log.d(LOG_TAG, "Now: " + now.toString());
                 String ssid = getCurrentSsid(getApplicationContext());
                 if (ssid != null) {
                     ssid = ssid.replace("\"", "");
@@ -152,7 +239,7 @@ public class AppsListActivity extends Activity {
                     ssid = "null";
                 }
 
-                Log.d("AppsListActivity", "Ssid: " + ssid);
+                Log.d(LOG_TAG, "Ssid: " + ssid);
                 String packageName = installedApps.get(position).packageName;
                 AppInfo info;
                 if (currentLocation != null) {
@@ -164,7 +251,7 @@ public class AppsListActivity extends Activity {
 
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 String infoPrettyPrint = gson.toJson(info);
-                Log.d("AppsListActivity", "AppInfo: " + infoPrettyPrint);
+                Log.d(LOG_TAG, "AppInfo: " + infoPrettyPrint);
 
                 //TODO: Close database connection based on application lifecycle.
                 //Insert the app launch information into database:
@@ -221,21 +308,21 @@ public class AppsListActivity extends Activity {
                         //Reading out all entries from the database.
                         while (!c.isAfterLast()) {
                             String appPackageName = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_PACKAGE_NAME));
-                            Log.d("AppsListActivity", "DB Read: PackageName: " + appPackageName);
+                            Log.d(LOG_TAG, "DB Read: PackageName: " + appPackageName);
                             String appName = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_NAME));
-                            Log.d("AppsListActivity", "DB Read: App Name: " + appName);
+                            Log.d(LOG_TAG, "DB Read: App Name: " + appName);
                             String wifiSSID = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_WIFI_SSID));
-                            Log.d("AppsListActivity", "DB Read: SSID: " + wifiSSID);
+                            Log.d(LOG_TAG, "DB Read: SSID: " + wifiSSID);
                             String bluetoothNetwork = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_BLUETOOTH));
-                            Log.d("AppsListActivity", "DB Read: Bluetooth: " + bluetoothNetwork);
+                            Log.d(LOG_TAG, "DB Read: Bluetooth: " + bluetoothNetwork);
                             String appLatitude = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_LATITUDE));
-                            Log.d("AppsListActivity", "DB Read: Latitude " + appLatitude);
+                            Log.d(LOG_TAG, "DB Read: Latitude " + appLatitude);
                             String appLongitude = c.getString(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_LONGITUDE));
-                            Log.d("AppsListActivity", "DB Read: Longitude: " + appLongitude);
+                            Log.d(LOG_TAG, "DB Read: Longitude: " + appLongitude);
 
                             long launchTime = c.getLong(c.getColumnIndex(AppInfoContract.AppInfoEntry.COL_NAME_LAUNCH_TIME));
                             Date launchDateTime = new Date(launchTime);
-                            Log.d("AppsListActivity", "DB Read: Launch Time: " + launchDateTime.toString());
+                            Log.d(LOG_TAG, "DB Read: Launch Time: " + launchDateTime.toString());
 
                             c.moveToNext();
                         }
@@ -247,41 +334,5 @@ public class AppsListActivity extends Activity {
                 startActivity(packageManager.getLaunchIntentForPackage(packageName));
             }
         });
-    }
-
-    public void getLocationUpdate() {
-        //TODO: Get location from best provider (network or GPS)
-        //Might also want to do something like poll location every 15 minutes or so, so as not to be
-        //so harsh on the battery.
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION);
-            return;
-        }
-        //TODO: Consider polling every x minutes to save battery.
-        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
-    }
-
-    //Source: http://stackoverflow.com/questions/8811315/how-to-get-current-wifi-connection-info-in-android
-    public static String getCurrentSsid(Context context) {
-        String ssid = null;
-        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
-        if (networkInfo.isConnected()) {
-            final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-            final WifiInfo connectionInfo = wifiManager.getConnectionInfo();
-            if (connectionInfo != null && !TextUtils.isEmpty(connectionInfo.getSSID())) {
-                ssid = connectionInfo.getSSID();
-            }
-        }
-        return ssid;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
