@@ -33,7 +33,7 @@
         android:layout_height="50dp"
         android:layout_gravity="bottom"
         android:layout_weight="0.2"
-        android:src="@mipmap/ic_grid_launcher" />
+        android:src="@drawable/ic_grid_launcher" />
 
     <com.launcher.openlauncher.ui.AppItem
         android:id="@+id/app_item_three"
