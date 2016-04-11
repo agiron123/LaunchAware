@@ -23,7 +23,9 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -44,7 +46,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class AppsListActivity extends Activity implements TextWatcher {
+public class AppsListActivity extends Activity implements TextWatcher,
+        View.OnFocusChangeListener, View.OnKeyListener {
 
     @Bind(R.id.search_edit_text)
     EditText mSearchEditText;
@@ -57,6 +60,131 @@ public class AppsListActivity extends Activity implements TextWatcher {
     private boolean isSearching;
 
     private static final int LOCATION_PERMISSION = 1;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_apps_list);
+
+        ButterKnife.bind(this);
+
+        if (savedInstanceState != null) {
+            isSearching = savedInstanceState.getBoolean(PrefsKey.SEARCHING_IN_GRID);
+            if (isSearching) {
+                mSearchEditText.requestFocus();
+            }
+        }
+        mSearchEditText.addTextChangedListener(this);
+        mSearchEditText.setOnFocusChangeListener(this);
+        mSearchEditText.setOnKeyListener(this);
+
+        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+        Drawable wallpaper = wallpaperManager.peekDrawable();
+        wallpaper.setAlpha(128);
+        getWindow().setBackgroundDrawable(wallpaper);
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSION);
+            return;
+        }
+        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                currentLocation = location;
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+            }
+        };
+
+        reorderApps("");
+    }
+
+
+    public void getLocationUpdate() {
+        //TODO: Get location from best provider (network or GPS)
+        //Might also want to do something like poll location every 15 minutes or so, so as not to be
+        //so harsh on the battery.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION);
+            return;
+        }
+        //TODO: Consider polling every x minutes to save battery.
+        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+    }
+
+    //Source: http://stackoverflow.com/questions/8811315/how-to-get-current-wifi-connection-info-in-android
+    public static String getCurrentSsid(Context context) {
+        String ssid = null;
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+        if (networkInfo.isConnected()) {
+            final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            final WifiInfo connectionInfo = wifiManager.getConnectionInfo();
+            if (connectionInfo != null && !TextUtils.isEmpty(connectionInfo.getSSID())) {
+                ssid = connectionInfo.getSSID();
+            }
+        }
+        return ssid;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        reorderApps(s.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            hideKeyboard(v);
+        }
+    }
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+            hideKeyboard(v);
+            return true;
+        }
+        return false;
+    }
 
     //http://stackoverflow.com/questions/12692870/filter-out-non-launchable-apps-when-getting-all-installed-apps
     public static List<ApplicationInfo> getAllInstalledApplications(Context context,
@@ -111,110 +239,9 @@ public class AppsListActivity extends Activity implements TextWatcher {
         return launchableInstalledApps;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_apps_list);
-
-        ButterKnife.bind(this);
-
-        if (savedInstanceState != null) {
-            isSearching = savedInstanceState.getBoolean(PrefsKey.SEARCHING_IN_GRID);
-            if (isSearching) {
-                mSearchEditText.requestFocus();
-            }
-        }
-        mSearchEditText.addTextChangedListener(this);
-
-        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
-        Drawable wallpaper = wallpaperManager.peekDrawable();
-        wallpaper.setAlpha(128);
-        getWindow().setBackgroundDrawable(wallpaper);
-
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(
-                        this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION},
-                    LOCATION_PERMISSION);
-            return;
-        }
-        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                currentLocation = location;
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-            }
-        };
-
-        reorderApps("");
-    }
-
-    public void getLocationUpdate() {
-        //TODO: Get location from best provider (network or GPS)
-        //Might also want to do something like poll location every 15 minutes or so, so as not to be
-        //so harsh on the battery.
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION);
-            return;
-        }
-        //TODO: Consider polling every x minutes to save battery.
-        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
-    }
-
-    //Source: http://stackoverflow.com/questions/8811315/how-to-get-current-wifi-connection-info-in-android
-    public static String getCurrentSsid(Context context) {
-        String ssid = null;
-        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
-        if (networkInfo.isConnected()) {
-            final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-            final WifiInfo connectionInfo = wifiManager.getConnectionInfo();
-            if (connectionInfo != null && !TextUtils.isEmpty(connectionInfo.getSSID())) {
-                ssid = connectionInfo.getSSID();
-            }
-        }
-        return ssid;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        reorderApps(s.toString());
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
+    private void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private void reorderApps(String searchText) {
