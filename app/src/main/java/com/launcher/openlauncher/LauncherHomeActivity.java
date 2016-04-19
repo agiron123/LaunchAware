@@ -18,6 +18,7 @@ import com.launcher.openlauncher.ui.AppItem;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 
 public class LauncherHomeActivity extends Activity {
 
@@ -52,6 +53,12 @@ public class LauncherHomeActivity extends Activity {
     @OnClick(R.id.app_grid_image)
     public void showAppsList() {
         startActivity(new Intent(this, AppsListActivity.class));
+    }
+
+    @OnLongClick(R.id.app_grid_image)
+    public boolean showSettings() {
+        startActivity(new Intent(this, SettingsActivity.class));
+        return true;
     }
 
     @Override
