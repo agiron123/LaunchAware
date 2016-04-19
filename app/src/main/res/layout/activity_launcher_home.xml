@@ -27,7 +27,7 @@
         android:layout_gravity="bottom"
         android:layout_weight="0.2" />
 
-    <com.launcher.openlauncher.ui.AppItem
+    <ImageView
         android:id="@+id/app_grid_image"
         android:layout_width="0dp"
         android:layout_height="50dp"

@@ -35,7 +35,7 @@ public class LauncherHomeActivity extends Activity {
     private float yInitial = 0;
 
     public static final String SMS_DEFAULT_APPLICATION = "sms_default_application";
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
