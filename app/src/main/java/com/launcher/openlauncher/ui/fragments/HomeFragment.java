@@ -1,4 +1,5 @@
-package com.launcher.openlauncher;
+package com.launcher.openlauncher.ui.fragments;
+
 
 import android.app.WallpaperManager;
 import android.content.Intent;
@@ -9,22 +10,26 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
-import com.launcher.openlauncher.core.BaseActivity;
-import com.launcher.openlauncher.core.LaunchAwareApplication;
-import com.launcher.openlauncher.ui.AppItem;
+import com.launcher.openlauncher.utils.PrefsKey;
+import com.launcher.openlauncher.R;
+import com.launcher.openlauncher.ui.views.AppItem;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnLongClick;
 
-public class LauncherHomeActivity extends BaseActivity {
+public class HomeFragment extends Fragment implements View.OnTouchListener {
 
     @Bind(R.id.main_layout_view)
     View mainLayoutView;
+
     @Bind(R.id.app_item_one)
     AppItem mAppItemOne;
     @Bind(R.id.app_item_two)
@@ -34,71 +39,32 @@ public class LauncherHomeActivity extends BaseActivity {
     @Bind(R.id.app_item_four)
     AppItem mAppItemFour;
 
-    private float yInitial = 0;
-
     public static final String SMS_DEFAULT_APPLICATION = "sms_default_application";
 
+    private float yInitial = 0;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_launcher_home);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        ButterKnife.bind(this);
-        LaunchAwareApplication.getComponent(this).inject(this);
-
-        final Drawable wallpaperDrawable = WallpaperManager.getInstance(this).getDrawable();
+        final Drawable wallpaperDrawable = WallpaperManager.getInstance(getContext()).getDrawable();
         mainLayoutView.setBackground(wallpaperDrawable);
 
         loadApps();
     }
 
-    @OnClick(R.id.app_grid_image)
-    public void showAppsList() {
-        startActivity(new Intent(this, AppsListActivity.class));
-    }
-
-    @OnLongClick(R.id.app_grid_image)
-    public boolean showSettings() {
-        startActivity(new Intent(this, SettingsActivity.class));
-        return true;
-    }
-
+    @Nullable
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        ButterKnife.bind(this, view);
 
-        int action = event.getActionMasked();
-
-        switch (action) {
-            //User just tapped on the screen
-            case (MotionEvent.ACTION_DOWN): {
-                yInitial = event.getY();
-                return true;
-            }
-
-            //User moved finger
-            case (MotionEvent.ACTION_MOVE): {
-
-                return true;
-            }
-
-            //User just lifted finger off of screen
-            case (MotionEvent.ACTION_UP): {
-                float swipeThreshold = 100;
-                if (event.getY() - yInitial >= swipeThreshold) {
-                    Intent i = new Intent(this, AppsListActivity.class);
-                    i.putExtra(PrefsKey.SEARCHING_IN_GRID, true);
-                    startActivity(i);
-                }
-                return true;
-            }
-
-            default:
-                return super.onTouchEvent(event);
-        }
+        view.setOnTouchListener(this);
+        return view;
     }
 
     private void loadApps() {
-        final PackageManager pm = getPackageManager();
+        final PackageManager pm = getContext().getPackageManager();
 
         // Phone
         final Intent phoneIntent = (new Intent(Intent.ACTION_DIAL));
@@ -115,7 +81,8 @@ public class LauncherHomeActivity extends BaseActivity {
         }
 
         // Texting
-        String defaultApplication = Settings.Secure.getString(getContentResolver(), SMS_DEFAULT_APPLICATION);
+        String defaultApplication = Settings.Secure.getString(getContext().
+                getContentResolver(), SMS_DEFAULT_APPLICATION);
         final Intent messagingIntent = pm.getLaunchIntentForPackage(defaultApplication);
         ResolveInfo messagingAppInfo = pm.resolveActivity(messagingIntent, PackageManager.MATCH_DEFAULT_ONLY);
 
@@ -159,5 +126,53 @@ public class LauncherHomeActivity extends BaseActivity {
                 }
             });
         }
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        int action = event.getActionMasked();
+
+        switch (action) {
+            //User just tapped on the screen
+            case (MotionEvent.ACTION_DOWN): {
+                yInitial = event.getY();
+                return true;
+            }
+
+            //User moved finger
+            case (MotionEvent.ACTION_MOVE): {
+
+                return true;
+            }
+
+            //User just lifted finger off of screen
+            case (MotionEvent.ACTION_UP): {
+                float swipeThreshold = 100;
+                if (event.getY() - yInitial >= swipeThreshold) {
+                    showAppsGrid(true);
+                }
+                return true;
+            }
+
+            default:
+                return false;
+        }
+    }
+
+    @OnClick(R.id.app_grid_image)
+    public void showAppsGrid(){
+        showAppsGrid(false);
+    }
+
+    private void showAppsGrid(boolean searchingInGrid){
+        final AppsListFragment appsListFragment = new AppsListFragment();
+        if(searchingInGrid){
+            Bundle bundle = new Bundle();
+            bundle.putBoolean(PrefsKey.SEARCHING_IN_GRID, true);
+            appsListFragment.setArguments(bundle);
+        }
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new AppsListFragment())
+                .addToBackStack(null).commit();
     }
 }

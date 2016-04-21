@@ -1,4 +1,4 @@
-package com.launcher.openlauncher;
+package com.launcher.openlauncher.models.db;
 
 import android.provider.BaseColumns;
 

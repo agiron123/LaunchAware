@@ -13,8 +13,6 @@ public class LaunchAwareApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        appComponent = DaggerAppComponent.builder()
-//                .launchAwareAppModule(new AppModule(this)).build();
         appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this)).netModule(new NetModule(BASE_URL)).build();
     }

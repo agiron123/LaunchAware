@@ -1,10 +1,12 @@
-package com.launcher.openlauncher;
+package com.launcher.openlauncher.ui.activities;
 
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
+
+import com.launcher.openlauncher.R;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On

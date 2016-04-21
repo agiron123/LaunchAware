@@ -1,4 +1,4 @@
-package com.launcher.openlauncher;
+package com.launcher.openlauncher.utils;
 
 
 import android.content.Context;
