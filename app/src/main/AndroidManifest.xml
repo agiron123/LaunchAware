@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.launcher.openlauncher">
-    
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -9,12 +9,12 @@
     <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
 
     <application
-        android:allowBackup="true"
+        android:name=".core.LaunchAwareApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.launcher.openlauncher.LauncherHomeActivity"
+            android:name=".LauncherHomeActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:stateNotNeeded="true">
@@ -27,7 +27,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.launcher.openlauncher.AppsListActivity"
+            android:name=".AppsListActivity"
             android:label="@string/title_activity_apps_list" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
+
 </manifest>

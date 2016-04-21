@@ -1,6 +1,5 @@
 package com.launcher.openlauncher;
 
-import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,13 +12,16 @@ import android.provider.Settings;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.launcher.openlauncher.core.BaseActivity;
+import com.launcher.openlauncher.core.LaunchAwareApplication;
 import com.launcher.openlauncher.ui.AppItem;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 
-public class LauncherHomeActivity extends Activity {
+public class LauncherHomeActivity extends BaseActivity {
 
     @Bind(R.id.main_layout_view)
     View mainLayoutView;
@@ -35,13 +37,14 @@ public class LauncherHomeActivity extends Activity {
     private float yInitial = 0;
 
     public static final String SMS_DEFAULT_APPLICATION = "sms_default_application";
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher_home);
 
         ButterKnife.bind(this);
+        LaunchAwareApplication.getComponent(this).inject(this);
 
         final Drawable wallpaperDrawable = WallpaperManager.getInstance(this).getDrawable();
         mainLayoutView.setBackground(wallpaperDrawable);
@@ -52,6 +55,12 @@ public class LauncherHomeActivity extends Activity {
     @OnClick(R.id.app_grid_image)
     public void showAppsList() {
         startActivity(new Intent(this, AppsListActivity.class));
+    }
+
+    @OnLongClick(R.id.app_grid_image)
+    public boolean showSettings() {
+        startActivity(new Intent(this, SettingsActivity.class));
+        return true;
     }
 
     @Override
