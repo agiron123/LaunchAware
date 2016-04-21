@@ -172,6 +172,8 @@ public class HomeFragment extends Fragment implements View.OnTouchListener {
             appsListFragment.setArguments(bundle);
         }
         getActivity().getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_up, R.anim.slide_down
+                        , R.anim.slide_up, R.anim.slide_down)
                 .replace(R.id.fragment_container, new AppsListFragment())
                 .addToBackStack(null).commit();
     }
