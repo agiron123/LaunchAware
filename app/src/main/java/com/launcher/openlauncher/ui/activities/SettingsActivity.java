@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.launcher.openlauncher.R;
+import com.launcher.openlauncher.core.BaseActivity;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -19,13 +21,13 @@ import com.launcher.openlauncher.R;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class SettingsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
-        getFragmentManager().beginTransaction().attach(new SettingsFragment()).commit();
+        getSupportFragmentManager().beginTransaction().attach(new SettingsFragment()).commit();
     }
 
     /**
@@ -39,11 +41,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    public static class SettingsFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
+    public static class SettingsFragment extends PreferenceFragmentCompat {
 
+        @Override
+        public void onCreatePreferences(Bundle bundle, String s) {
             addPreferencesFromResource(R.xml.preferences);
         }
     }

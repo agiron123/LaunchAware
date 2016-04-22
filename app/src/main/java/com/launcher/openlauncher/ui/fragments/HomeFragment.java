@@ -18,12 +18,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.launcher.openlauncher.R;
+import com.launcher.openlauncher.ui.activities.SettingsActivity;
 import com.launcher.openlauncher.ui.views.AppItem;
 import com.launcher.openlauncher.utils.PrefsKey;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 
 public class HomeFragment extends Fragment implements View.OnTouchListener {
 
@@ -162,6 +164,17 @@ public class HomeFragment extends Fragment implements View.OnTouchListener {
     @OnClick(R.id.app_grid_image)
     public void showAppsGrid(){
         showAppsGrid(false);
+    }
+
+    @OnLongClick(R.id.app_grid_image)
+    public boolean showSettings(){
+        Intent intent = new Intent(getContext(), SettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+
+        startActivity(intent);
+        getActivity().finish();
+
+        return true;
     }
 
     private void showAppsGrid(boolean searchingInGrid){
