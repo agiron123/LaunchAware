@@ -17,9 +17,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.launcher.openlauncher.utils.PrefsKey;
 import com.launcher.openlauncher.R;
 import com.launcher.openlauncher.ui.views.AppItem;
+import com.launcher.openlauncher.utils.PrefsKey;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

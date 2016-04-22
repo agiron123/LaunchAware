@@ -3,11 +3,13 @@ package com.launcher.openlauncher.ui.fragments;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,9 +22,9 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 
+import com.launcher.openlauncher.R;
 import com.launcher.openlauncher.ui.adapters.GridAdapter;
 import com.launcher.openlauncher.utils.PrefsKey;
-import com.launcher.openlauncher.R;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -355,7 +357,11 @@ public class AppsListFragment extends Fragment implements TextWatcher,
 //                    Log.d("Exception: ", e.getMessage().toString());
 //                }
 
-                startActivity(packageManager.getLaunchIntentForPackage(packageName));
+                Intent intent = packageManager.getLaunchIntentForPackage(packageName);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+
+                startActivity(intent);
+                getActivity().finish();
             }
         });
     }
