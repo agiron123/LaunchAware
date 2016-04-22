@@ -59,8 +59,9 @@ public class AppsListFragment extends Fragment implements TextWatcher,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            isSearching = savedInstanceState.getBoolean(PrefsKey.SEARCHING_IN_GRID);
+        final Bundle bundle = getArguments();
+        if(bundle != null && bundle.size() > 0){
+            isSearching = bundle.getBoolean(PrefsKey.SEARCHING_IN_GRID);
         }
     }
 

@@ -166,15 +166,14 @@ public class HomeFragment extends Fragment implements View.OnTouchListener {
 
     private void showAppsGrid(boolean searchingInGrid){
         final AppsListFragment appsListFragment = new AppsListFragment();
-        if(searchingInGrid){
-            Bundle bundle = new Bundle();
-            bundle.putBoolean(PrefsKey.SEARCHING_IN_GRID, true);
-            appsListFragment.setArguments(bundle);
-        }
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(PrefsKey.SEARCHING_IN_GRID, searchingInGrid);
+        appsListFragment.setArguments(bundle);
+
         getActivity().getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_up, R.anim.slide_down
                         , R.anim.slide_up, R.anim.slide_down)
-                .replace(R.id.fragment_container, new AppsListFragment())
+                .replace(R.id.fragment_container, appsListFragment)
                 .addToBackStack(null).commit();
     }
 }
