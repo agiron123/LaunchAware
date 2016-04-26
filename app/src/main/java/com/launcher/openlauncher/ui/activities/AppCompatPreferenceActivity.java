@@ -1,4 +1,4 @@
-package com.launcher.openlauncher;
+package com.launcher.openlauncher.ui.activities;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

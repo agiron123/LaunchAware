@@ -1,4 +1,4 @@
-package com.launcher.openlauncher;
+package com.launcher.openlauncher.ui.adapters;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.launcher.openlauncher.R;
 
 import java.util.List;
 

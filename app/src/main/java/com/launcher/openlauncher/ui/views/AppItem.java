@@ -1,4 +1,4 @@
-package com.launcher.openlauncher.ui;
+package com.launcher.openlauncher.ui.views;
 
 import android.annotation.TargetApi;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.launcher.openlauncher;
+package com.launcher.openlauncher.models.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
