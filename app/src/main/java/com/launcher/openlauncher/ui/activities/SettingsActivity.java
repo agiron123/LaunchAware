@@ -3,12 +3,10 @@ package com.launcher.openlauncher.ui.activities;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.preference.PreferenceFragmentCompat;
 
-import com.launcher.openlauncher.R;
 import com.launcher.openlauncher.core.BaseActivity;
+import com.launcher.openlauncher.ui.fragments.SettingsFragment;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -27,7 +25,7 @@ public class SettingsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
-        getSupportFragmentManager().beginTransaction().attach(new SettingsFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(new SettingsFragment(), null).commit();
     }
 
     /**
@@ -38,14 +36,6 @@ public class SettingsActivity extends BaseActivity {
         if (actionBar != null) {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
-    public static class SettingsFragment extends PreferenceFragmentCompat {
-
-        @Override
-        public void onCreatePreferences(Bundle bundle, String s) {
-            addPreferencesFromResource(R.xml.preferences);
         }
     }
 }

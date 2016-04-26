@@ -6,6 +6,7 @@
     <string name="title_activity_apps_list">AppsListActivity</string>
     <string name="search">Search</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="background">Background</string>
 
     <!-- Strings related to Settings -->
 
